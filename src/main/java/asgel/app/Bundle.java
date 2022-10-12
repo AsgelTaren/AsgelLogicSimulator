@@ -8,11 +8,11 @@ import java.net.URLClassLoader;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
-import javax.swing.JComponent;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import asgel.core.bundle.RessourceManager;
 import asgel.core.model.ModelRegistry;
 
 public class Bundle {
@@ -45,9 +45,10 @@ public class Bundle {
 	public void load(ModelRegistry registry) throws Exception {
 		URLClassLoader child = new URLClassLoader(new URL[] { file.toURI().toURL() }, this.getClass().getClassLoader());
 		Class<?> bundle = Class.forName(main + ".Bundle", true, child);
-		Method method = bundle.getDeclaredMethod("loadBundle", ModelRegistry.class, JComponent.class);
+		Method method = bundle.getDeclaredMethod("loadBundle", ModelRegistry.class, RessourceManager.class);
 		Object instance = bundle.getConstructor().newInstance();
-		method.invoke(instance, registry, null);
+		RessourceManager res = new RessourceManager(bundle);
+		method.invoke(instance, registry, res);
 	}
 
 	public String getDesc() {
