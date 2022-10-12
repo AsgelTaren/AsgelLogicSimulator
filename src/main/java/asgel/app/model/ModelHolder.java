@@ -9,6 +9,8 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.util.ArrayList;
 
+import javax.swing.SwingUtilities;
+
 import asgel.app.App;
 import asgel.core.gfx.Point;
 import asgel.core.gfx.Renderer;
@@ -35,6 +37,7 @@ public class ModelHolder implements MouseMotionListener, MouseListener, MouseWhe
 	// Highlighted
 	private ModelOBJ highOBJ;
 	private Pin highPin;
+	private Point delta;
 
 	// Mouse
 	private Point mouseInModel;
@@ -109,7 +112,11 @@ public class ModelHolder implements MouseMotionListener, MouseListener, MouseWhe
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-
+		if (SwingUtilities.isLeftMouseButton(e)) {
+			if (highOBJ != null) {
+				delta = highOBJ.getPos().sub(mouseInModel);
+			}
+		}
 	}
 
 	@Override
@@ -129,7 +136,12 @@ public class ModelHolder implements MouseMotionListener, MouseListener, MouseWhe
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
-
+		mouseInModel = fromCameraToModel(new Point(e.getX(), e.getY()));
+		if (SwingUtilities.isLeftMouseButton(e)) {
+			if (highOBJ != null) {
+				highOBJ.setPos(delta.add(mouseInModel));
+			}
+		}
 	}
 
 	@Override

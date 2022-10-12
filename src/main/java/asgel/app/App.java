@@ -52,7 +52,7 @@ public class App implements Runnable, MouseListener, MouseMotionListener, MouseW
 	private JTree tree;
 
 	public App() {
-
+		
 	}
 
 	private void init() {
@@ -119,6 +119,10 @@ public class App implements Runnable, MouseListener, MouseMotionListener, MouseW
 
 	public JTree getTree() {
 		return tree;
+	}
+
+	public JFrame getJFrame() {
+		return frame;
 	}
 
 	public synchronized void start() {
