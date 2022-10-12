@@ -1,1 +1,3 @@
 rootProject.name = 'AsgelLogicSimulator'
+include ":AsgelLogicCore"
+project(":AsgelLogicCore").projectDir = new File("../AsgelLogicCore/")
