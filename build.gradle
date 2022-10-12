@@ -9,6 +9,7 @@ repositories {
 dependencies {
     testImplementation 'junit:junit:4.13.2'
     implementation project(":AsgelLogicCore")
+    implementation 'com.formdev:flatlaf:2.5'
 }
 
 application {
