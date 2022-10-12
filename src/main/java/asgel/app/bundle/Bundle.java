@@ -1,17 +1,16 @@
-package asgel.app;
+package asgel.app.bundle;
 
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 
-import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import asgel.app.Utils;
 import asgel.core.bundle.RessourceManager;
 import asgel.core.model.ModelRegistry;
 
@@ -38,8 +37,7 @@ public class Bundle {
 		this.desc = obj.get("desc").getAsString();
 		this.main = obj.get("main").getAsString();
 
-		BufferedImage img = ImageIO.read(Utils.openStreamInJar(file, "logo.png"));
-		icon = new ImageIcon(img);
+		icon = asgel.core.bundle.Utils.loadIcon(Utils.openStreamInJar(file, "logo.png"), 16);
 	}
 
 	public void load(ModelRegistry registry) throws Exception {

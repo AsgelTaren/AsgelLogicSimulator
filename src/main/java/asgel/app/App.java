@@ -19,6 +19,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.ToolTipManager;
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import asgel.app.bundle.Bundle;
 import asgel.app.model.ModelHolder;
 import asgel.app.model.OBJTreeDropTarget;
 import asgel.app.model.OBJTreeRenderer;
@@ -123,6 +124,10 @@ public class App implements Runnable, MouseListener, MouseMotionListener, MouseW
 
 	public JFrame getJFrame() {
 		return frame;
+	}
+
+	public ArrayList<Bundle> getBundles() {
+		return bundles;
 	}
 
 	public synchronized void start() {
