@@ -52,6 +52,9 @@ public class App implements Runnable, MouseListener, MouseMotionListener, MouseW
 	// Object Tree
 	private JTree tree;
 
+	// App Menu Bar
+	private AppMenuBar menubar;
+
 	public App() {
 
 	}
@@ -84,6 +87,11 @@ public class App implements Runnable, MouseListener, MouseMotionListener, MouseW
 		ToolTipManager.sharedInstance().registerComponent(tree);
 		tree.setCellRenderer(new OBJTreeRenderer());
 		frame.add(scroll, BorderLayout.EAST);
+
+		// MenuBar
+		menubar = new AppMenuBar(this);
+		menubar.init();
+		frame.setJMenuBar(menubar);
 
 		frame.pack();
 
