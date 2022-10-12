@@ -52,7 +52,7 @@ public class App implements Runnable, MouseListener, MouseMotionListener, MouseW
 	private JTree tree;
 
 	public App() {
-		
+
 	}
 
 	private void init() {
@@ -177,8 +177,8 @@ public class App implements Runnable, MouseListener, MouseMotionListener, MouseW
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			System.out
-					.println("[REGISTRY] -->" + entry.getId() + " from " + entry.getBundle() + " : " + entry.getName());
+			System.out.println("[REGISTRY] -->" + entry.getId() + " from " + entry.getBundle() + " : " + entry.getName()
+					+ ", with provider " + entry.getProvider() + ", with loader " + entry.getLoader());
 		}
 	}
 

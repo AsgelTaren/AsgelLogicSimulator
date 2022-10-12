@@ -72,12 +72,14 @@ public class ModelHolder implements MouseMotionListener, MouseListener, MouseWhe
 
 		renderer.pop();
 
+		renderer.drawString("Camera: " + camx + ", " + camy, 15, 15, Color.BLACK);
+		renderer.drawString("Zoom: " + zoom, 15, 30, Color.BLACK);
 		if (highOBJ != null) {
-			renderer.drawString(highOBJ.toString(), 15, 15, Color.BLACK);
+			renderer.drawString(highOBJ.toString(), 15, 45, Color.BLACK);
 		}
 
 		if (mouseInModel != null) {
-			renderer.drawString("Mouse: " + mouseInModel.x + ", " + mouseInModel.y, 15, 30, Color.BLACK);
+			renderer.drawString("Mouse: " + mouseInModel.x + ", " + mouseInModel.y, 15, 60, Color.BLACK);
 			for (int i = 0; i < model.getObjects().size(); i++) {
 				ModelOBJ obj = model.getObjects().get(i);
 				renderer.drawString(
@@ -102,7 +104,13 @@ public class ModelHolder implements MouseMotionListener, MouseListener, MouseWhe
 
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
-
+		float oldzoom = zoom;
+		zoom *= (float) Math.pow(1.15, e.getWheelRotation());
+		camx = (app.getRenderer().getWidth() >> 1) - e.getX()
+				+ zoom / oldzoom * (e.getX() + camx - (app.getRenderer().getWidth() >> 1));
+		camy = (app.getRenderer().getHeight() >> 1) - e.getY()
+				+ zoom / oldzoom * (e.getY() + camy - (app.getRenderer().getHeight() >> 1));
+		refreshHigh();
 	}
 
 	@Override
@@ -142,13 +150,21 @@ public class ModelHolder implements MouseMotionListener, MouseListener, MouseWhe
 				highOBJ.setPos(delta.add(mouseInModel));
 			}
 		}
+		if (SwingUtilities.isMiddleMouseButton(e)) {
+
+		}
 	}
 
 	@Override
 	public void mouseMoved(MouseEvent e) {
+		mouseInModel = fromCameraToModel(new Point(e.getX(), e.getY()));
+		refreshHigh();
+	}
+
+	private void refreshHigh() {
 		highOBJ = null;
 		highPin = null;
-		mouseInModel = fromCameraToModel(new Point(e.getX(), e.getY()));
+
 		for (ModelOBJ obj : model.getObjects()) {
 			Point point = obj.fromModelToObject(mouseInModel);
 			if (obj.containsFromObject(point, 5)) {
