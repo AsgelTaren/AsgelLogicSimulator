@@ -12,7 +12,7 @@ import com.google.gson.JsonParser;
 
 import asgel.app.Utils;
 import asgel.core.bundle.RessourceManager;
-import asgel.core.model.ModelRegistry;
+import asgel.core.model.BundleRegistry;
 
 public class Bundle {
 
@@ -40,10 +40,10 @@ public class Bundle {
 		icon = asgel.core.bundle.Utils.loadIcon(Utils.openStreamInJar(file, "logo.png"), 16);
 	}
 
-	public void load(ModelRegistry registry) throws Exception {
+	public void load(BundleRegistry registry) throws Exception {
 		URLClassLoader child = new URLClassLoader(new URL[] { file.toURI().toURL() }, this.getClass().getClassLoader());
 		Class<?> bundle = Class.forName(main + ".Bundle", true, child);
-		Method method = bundle.getDeclaredMethod("loadBundle", ModelRegistry.class, RessourceManager.class);
+		Method method = bundle.getDeclaredMethod("loadBundle", BundleRegistry.class, RessourceManager.class);
 		Object instance = bundle.getConstructor().newInstance();
 		RessourceManager res = new RessourceManager(bundle);
 		method.invoke(instance, registry, res);

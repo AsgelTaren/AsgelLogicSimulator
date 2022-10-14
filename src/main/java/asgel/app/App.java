@@ -1,7 +1,10 @@
 package asgel.app;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.dnd.DropTarget;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -10,14 +13,18 @@ import java.awt.event.MouseWheelListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map.Entry;
 
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.ListSelectionModel;
 import javax.swing.ToolTipManager;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
 
 import asgel.app.bundle.Bundle;
 import asgel.app.model.ModelHolder;
@@ -25,12 +32,13 @@ import asgel.app.model.OBJTreeDropTarget;
 import asgel.app.model.OBJTreeRenderer;
 import asgel.app.model.OBJTreeTransferHandler;
 import asgel.core.gfx.Renderer;
+import asgel.core.model.BundleRegistry;
+import asgel.core.model.BundleRegistry.ObjectEntry;
+import asgel.core.model.GlobalRegistry;
 import asgel.core.model.Model;
-import asgel.core.model.ModelRegistry;
-import asgel.core.model.ModelRegistry.ObjectEntry;
 import asgel.core.model.ModelTab;
 
-public class App implements Runnable, MouseListener, MouseMotionListener, MouseWheelListener {
+public class App implements Runnable, MouseListener, MouseMotionListener, MouseWheelListener, KeyListener {
 
 	// Thread
 	private Thread thread;
@@ -46,11 +54,16 @@ public class App implements Runnable, MouseListener, MouseMotionListener, MouseW
 	// Bundles
 	private ArrayList<Bundle> bundles;
 
-	// Model Registry
-	private ModelRegistry registry;
+	// Global Registry
+	private GlobalRegistry registry;
 
 	// Object Tree
 	private JTree tree;
+	private JTextField searchBar;
+	private OBJTreeRenderer treeRend;
+	private DefaultMutableTreeNode root;
+	private HashMap<String, DefaultMutableTreeNode> tabs;
+	private HashMap<String, DefaultMutableTreeNode> entries;
 
 	// App Menu Bar
 	private AppMenuBar menubar;
@@ -60,7 +73,7 @@ public class App implements Runnable, MouseListener, MouseMotionListener, MouseW
 	}
 
 	private void init() {
-		registry = new ModelRegistry();
+		registry = new GlobalRegistry();
 		loadBundles();
 
 		frame = new JFrame("AsgelLogicSimulator origins");
@@ -73,20 +86,60 @@ public class App implements Runnable, MouseListener, MouseMotionListener, MouseW
 		renderer.addMouseListener(this);
 		renderer.addMouseMotionListener(this);
 		renderer.addMouseWheelListener(this);
+		renderer.addKeyListener(this);
+
+		// Right-side panel
+		JPanel right = new JPanel();
+		right.setLayout(new BoxLayout(right, BoxLayout.PAGE_AXIS));
+
+		searchBar = new JTextField();
+		searchBar.setPreferredSize(new Dimension(200, 25));
+		searchBar.setMaximumSize(new Dimension(200, 25));
+		searchBar.setMinimumSize(new Dimension(200, 25));
+
+		JPanel searchPanel = new JPanel();
+		searchPanel.setLayout(new BoxLayout(searchPanel, BoxLayout.PAGE_AXIS));
+		searchPanel.add(searchBar);
+
+		searchPanel.setBorder(BorderFactory.createTitledBorder("Search"));
+
+		right.add(searchPanel);
 
 		// Tree
 		buildTree();
 		tree.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tree.setDragEnabled(true);
 		tree.setTransferHandler(new OBJTreeTransferHandler(this));
+		ToolTipManager.sharedInstance().registerComponent(tree);
+		tree.setCellRenderer(treeRend = new OBJTreeRenderer());
 
 		@SuppressWarnings("unused")
 		DropTarget target = new DropTarget(renderer, new OBJTreeDropTarget(this));
 
 		JScrollPane scroll = new JScrollPane(tree);
-		ToolTipManager.sharedInstance().registerComponent(tree);
-		tree.setCellRenderer(new OBJTreeRenderer());
-		frame.add(scroll, BorderLayout.EAST);
+		right.add(scroll);
+
+		// Search Bar Listener
+		searchBar.addActionListener(e -> {
+			ArrayList<ObjectEntry> searchResult = new ArrayList<ObjectEntry>();
+			if (searchBar.getText() != null && !searchBar.getText().equals(""))
+				for (ObjectEntry entry : registry.allObjectEntries()) {
+					if (entry.getFullID().contains(searchBar.getText())
+							|| entry.getName().contains(searchBar.getText())) {
+						searchResult.add(entry);
+					}
+				}
+			treeRend.setSearchResult(searchResult);
+			tree.clearSelection();
+			for (ObjectEntry entry : searchResult) {
+				tree.addSelectionPath(new TreePath(
+						new Object[] { root, tabs.get(entry.getTab().getID()), entries.get(entry.getFullID()) }));
+			}
+			tree.revalidate();
+			tree.repaint();
+		});
+
+		frame.add(right, BorderLayout.EAST);
 
 		// MenuBar
 		menubar = new AppMenuBar(this);
@@ -138,6 +191,10 @@ public class App implements Runnable, MouseListener, MouseMotionListener, MouseW
 		return bundles;
 	}
 
+	public GlobalRegistry getRegistry() {
+		return registry;
+	}
+
 	public synchronized void start() {
 		if (running)
 			return;
@@ -174,9 +231,10 @@ public class App implements Runnable, MouseListener, MouseMotionListener, MouseW
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-
+			BundleRegistry reg = new BundleRegistry(bundle.getID());
+			registry.getRegistries().put(bundle.getID(), reg);
 			try {
-				bundle.load(registry);
+				bundle.load(reg);
 				System.out.println("[BUNDLES] Loaded " + bundle.getID());
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -184,30 +242,33 @@ public class App implements Runnable, MouseListener, MouseMotionListener, MouseW
 		}
 
 		System.out.println("[REGISTRY] List of all registered object entires");
-		for (ObjectEntry entry : registry.OBJECT_REGISTRY.values()) {
+		for (ObjectEntry entry : registry.allObjectEntries()) {
 			try {
 				entry.matchTab();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			System.out.println("[REGISTRY] -->" + entry.getId() + " from " + entry.getBundle() + " : " + entry.getName()
-					+ ", with provider " + entry.getProvider() + ", with loader " + entry.getLoader());
+			System.out.println("[REGISTRY] -->" + entry.getFullID() + " : " + entry.getName() + ", with provider "
+					+ entry.getProvider() + ", with loader " + entry.getLoader());
 		}
 	}
 
 	private void buildTree() {
-		DefaultMutableTreeNode root = new DefaultMutableTreeNode("AsgelLogicSimulator");
+		root = new DefaultMutableTreeNode("AsgelLogicSimulator");
 
-		HashMap<String, DefaultMutableTreeNode> tabs = new HashMap<String, DefaultMutableTreeNode>();
+		tabs = new HashMap<String, DefaultMutableTreeNode>();
+		entries = new HashMap<String, DefaultMutableTreeNode>();
 
-		for (Entry<String, ModelTab> entry : registry.TAB_REGISTRY.entrySet()) {
-			DefaultMutableTreeNode node = new DefaultMutableTreeNode(entry.getValue());
-			tabs.put(entry.getKey(), node);
+		for (ModelTab tab : registry.allModelTabs()) {
+			DefaultMutableTreeNode node = new DefaultMutableTreeNode(tab);
+			tabs.put(tab.getFullID(), node);
 			root.add(node);
 		}
 
-		for (ObjectEntry reg : registry.OBJECT_REGISTRY.values()) {
-			tabs.get(reg.getTab().getID()).add(new DefaultMutableTreeNode(reg));
+		for (ObjectEntry entry : registry.allObjectEntries()) {
+			DefaultMutableTreeNode node = new DefaultMutableTreeNode(entry);
+			tabs.get(entry.getTab().getFullID()).add(node);
+			entries.put(entry.getFullID(), node);
 		}
 
 		tree = new JTree(root);
@@ -251,6 +312,21 @@ public class App implements Runnable, MouseListener, MouseMotionListener, MouseW
 	@Override
 	public void mouseExited(MouseEvent e) {
 		holder.mouseExited(e);
+	}
+
+	@Override
+	public void keyTyped(KeyEvent e) {
+		holder.keyTyped(e);
+	}
+
+	@Override
+	public void keyPressed(KeyEvent e) {
+		holder.keyPressed(e);
+	}
+
+	@Override
+	public void keyReleased(KeyEvent e) {
+		holder.keyReleased(e);
 	}
 
 }
