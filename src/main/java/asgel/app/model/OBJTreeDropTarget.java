@@ -7,7 +7,7 @@ import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
 
 import asgel.app.App;
-import asgel.core.model.ModelRegistry.ObjectEntry;
+import asgel.core.model.BundleRegistry.ObjectEntry;
 
 public class OBJTreeDropTarget implements DropTargetListener {
 

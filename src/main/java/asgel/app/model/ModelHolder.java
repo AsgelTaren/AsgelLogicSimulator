@@ -2,6 +2,8 @@ package asgel.app.model;
 
 import java.awt.Color;
 import java.awt.datatransfer.DataFlavor;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -14,13 +16,14 @@ import javax.swing.SwingUtilities;
 import asgel.app.App;
 import asgel.core.gfx.Point;
 import asgel.core.gfx.Renderer;
+import asgel.core.model.Clickable;
 import asgel.core.model.Link;
 import asgel.core.model.Model;
 import asgel.core.model.ModelOBJ;
-import asgel.core.model.ModelRegistry.ObjectEntry;
+import asgel.core.model.BundleRegistry.ObjectEntry;
 import asgel.core.model.Pin;
 
-public class ModelHolder implements MouseMotionListener, MouseListener, MouseWheelListener {
+public class ModelHolder implements MouseMotionListener, MouseListener, MouseWheelListener, KeyListener {
 
 	// OBJ Flavor
 	public static final DataFlavor OBJFLAVOR = new DataFlavor(ObjectEntry.class, "Flavor for object registry");
@@ -36,7 +39,7 @@ public class ModelHolder implements MouseMotionListener, MouseListener, MouseWhe
 
 	// Highlighted
 	private ModelOBJ highOBJ;
-	private Pin highPin;
+	private Pin highPin, anchor;
 	private Point delta;
 
 	// Mouse
@@ -57,17 +60,27 @@ public class ModelHolder implements MouseMotionListener, MouseListener, MouseWhe
 			model.getObjects().addAll(objToAdd);
 			objToAdd = new ArrayList<ModelOBJ>();
 		}
+		if (mouseInModel == null)
+			return;
 		renderer.push();
 		renderer.center();
 		renderer.translate(-camx, -camy);
 		renderer.scale(zoom);
 
 		for (ModelOBJ obj : model.getObjects()) {
-			obj.render(renderer, highOBJ, highPin);
+			obj.render(renderer, highOBJ, highPin, anchor);
 		}
 
 		for (Link l : model.getLinks()) {
 			l.isCoherent();
+			l.render(renderer);
+		}
+
+		if (anchor != null) {
+			renderer.drawLine(anchor.posInModel(),
+					(highPin != null && highPin.getLink() == null && highPin.isInput() != anchor.isInput()
+							&& highPin.getSize() == anchor.getSize()) ? highPin.posInModel() : mouseInModel,
+					Color.BLACK);
 		}
 
 		renderer.pop();
@@ -75,18 +88,17 @@ public class ModelHolder implements MouseMotionListener, MouseListener, MouseWhe
 		renderer.drawString("Camera: " + camx + ", " + camy, 15, 15, Color.BLACK);
 		renderer.drawString("Zoom: " + zoom, 15, 30, Color.BLACK);
 		if (highOBJ != null) {
-			renderer.drawString(highOBJ.toString(), 15, 45, Color.BLACK);
+			renderer.drawString(highOBJ.toString(), 15, 60, Color.BLACK);
 		}
 
-		if (mouseInModel != null) {
-			renderer.drawString("Mouse: " + mouseInModel.x + ", " + mouseInModel.y, 15, 60, Color.BLACK);
-			for (int i = 0; i < model.getObjects().size(); i++) {
-				ModelOBJ obj = model.getObjects().get(i);
-				renderer.drawString(
-						obj + " : " + obj.getX() + ", " + obj.getY() + ": " + obj.fromModelToObject(mouseInModel), 15,
-						30 + (i + 1) * 15, Color.BLACK);
-			}
+		renderer.drawString("Mouse: " + mouseInModel.x + ", " + mouseInModel.y, 15, 45, Color.BLACK);
+		for (int i = 0; i < model.getObjects().size(); i++) {
+			ModelOBJ obj = model.getObjects().get(i);
+			renderer.drawString(
+					obj + " : " + obj.getX() + ", " + obj.getY() + ": " + obj.fromModelToObject(mouseInModel), 15,
+					60 + (i + 1) * 15, Color.BLACK);
 		}
+
 	}
 
 	public synchronized void addObject(ObjectEntry entry, int mousex, int mousey) {
@@ -123,13 +135,19 @@ public class ModelHolder implements MouseMotionListener, MouseListener, MouseWhe
 		if (SwingUtilities.isLeftMouseButton(e)) {
 			if (highOBJ != null) {
 				delta = highOBJ.getPos().sub(mouseInModel);
+			} else if (highPin != null && highPin.getLink() == null) {
+				anchor = highPin;
 			}
 		}
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-
+		if (anchor != null && highPin != null && highPin.getLink() == null && highPin.getSize() == anchor.getSize()
+				&& highPin.isInput() != anchor.isInput()) {
+			model.getLinks().add(Link.createAndApply(anchor, highPin));
+		}
+		anchor = null;
 	}
 
 	@Override
@@ -146,8 +164,13 @@ public class ModelHolder implements MouseMotionListener, MouseListener, MouseWhe
 	public void mouseDragged(MouseEvent e) {
 		mouseInModel = fromCameraToModel(new Point(e.getX(), e.getY()));
 		if (SwingUtilities.isLeftMouseButton(e)) {
-			if (highOBJ != null) {
+			if (highOBJ != null && anchor == null) {
 				highOBJ.setPos(delta.add(mouseInModel));
+			} else if (anchor != null) {
+				refreshHigh();
+				if (highPin == anchor) {
+					highPin = null;
+				}
 			}
 		}
 		if (SwingUtilities.isMiddleMouseButton(e)) {
@@ -180,6 +203,29 @@ public class ModelHolder implements MouseMotionListener, MouseListener, MouseWhe
 				}
 			}
 		}
+	}
+
+	@Override
+	public void keyTyped(KeyEvent e) {
+
+	}
+
+	@Override
+	public void keyPressed(KeyEvent e) {
+		if (e.getKeyCode() == KeyEvent.VK_C) {
+			if (highOBJ != null && highOBJ instanceof Clickable c) {
+				c.onClick();
+				ArrayList<ModelOBJ> ref = new ArrayList<ModelOBJ>();
+				ref.add(highOBJ);
+				model.refresh(ref);
+			}
+		}
+
+	}
+
+	@Override
+	public void keyReleased(KeyEvent e) {
+
 	}
 
 }
