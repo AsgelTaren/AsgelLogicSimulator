@@ -16,11 +16,11 @@ import javax.swing.SwingUtilities;
 import asgel.app.App;
 import asgel.core.gfx.Point;
 import asgel.core.gfx.Renderer;
+import asgel.core.model.BundleRegistry.ObjectEntry;
 import asgel.core.model.Clickable;
 import asgel.core.model.Link;
 import asgel.core.model.Model;
 import asgel.core.model.ModelOBJ;
-import asgel.core.model.BundleRegistry.ObjectEntry;
 import asgel.core.model.Pin;
 
 public class ModelHolder implements MouseMotionListener, MouseListener, MouseWheelListener, KeyListener {
@@ -106,6 +106,7 @@ public class ModelHolder implements MouseMotionListener, MouseListener, MouseWhe
 		ModelOBJ obj = entry.getProvider().apply(mouse);
 		if (obj != null) {
 			objToAdd.add(obj);
+			obj.update();
 		}
 	}
 
@@ -145,7 +146,11 @@ public class ModelHolder implements MouseMotionListener, MouseListener, MouseWhe
 	public void mouseReleased(MouseEvent e) {
 		if (anchor != null && highPin != null && highPin.getLink() == null && highPin.getSize() == anchor.getSize()
 				&& highPin.isInput() != anchor.isInput()) {
-			model.getLinks().add(Link.createAndApply(anchor, highPin));
+			Link l = Link.createAndApply(anchor, highPin);
+			model.getLinks().add(l);
+			ArrayList<ModelOBJ> temp = new ArrayList<ModelOBJ>();
+			temp.add(l.getStart().getModelOBJ());
+			model.refresh(temp);
 		}
 		anchor = null;
 	}

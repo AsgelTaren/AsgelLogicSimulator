@@ -10,7 +10,6 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -27,6 +26,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
 import asgel.app.bundle.Bundle;
+import asgel.app.bundle.BundleLoadingFrame;
 import asgel.app.model.ModelHolder;
 import asgel.app.model.OBJTreeDropTarget;
 import asgel.app.model.OBJTreeRenderer;
@@ -74,7 +74,9 @@ public class App implements Runnable, MouseListener, MouseMotionListener, MouseW
 
 	private void init() {
 		registry = new GlobalRegistry();
-		loadBundles();
+		BundleLoadingFrame load = new BundleLoadingFrame();
+		load.showFrame();
+		loadBundles(load.getBundles());
 
 		frame = new JFrame("AsgelLogicSimulator origins");
 		frame.setVisible(true);
@@ -123,17 +125,19 @@ public class App implements Runnable, MouseListener, MouseMotionListener, MouseW
 		searchBar.addActionListener(e -> {
 			ArrayList<ObjectEntry> searchResult = new ArrayList<ObjectEntry>();
 			if (searchBar.getText() != null && !searchBar.getText().equals(""))
-				for (ObjectEntry entry : registry.allObjectEntries()) {
-					if (entry.getFullID().contains(searchBar.getText())
-							|| entry.getName().contains(searchBar.getText())) {
-						searchResult.add(entry);
+				for (BundleRegistry regis : registry.getRegistries().values()) {
+					for (ObjectEntry entry : regis.OBJECT_REGISTRY.values()) {
+						if (entry.getFullID().contains(searchBar.getText())
+								|| entry.getName().contains(searchBar.getText())) {
+							searchResult.add(entry);
+						}
 					}
 				}
 			treeRend.setSearchResult(searchResult);
 			tree.clearSelection();
 			for (ObjectEntry entry : searchResult) {
 				tree.addSelectionPath(new TreePath(
-						new Object[] { root, tabs.get(entry.getTab().getID()), entries.get(entry.getFullID()) }));
+						new Object[] { root, tabs.get(entry.getFullTab()), entries.get(entry.getFullID()) }));
 			}
 			tree.revalidate();
 			tree.repaint();
@@ -214,17 +218,15 @@ public class App implements Runnable, MouseListener, MouseMotionListener, MouseW
 		}
 	}
 
-	private void loadBundles() {
+	private void loadBundles(ArrayList<BundleLoadingFrame.BundleHolder> temp) {
 		bundles = new ArrayList<Bundle>();
 
-		File root = new File(System.getenv("APPDATA") + "/AsgelLogicSim/bundles/");
-		for (File f : root.listFiles()) {
-			if (f.getName().endsWith(".jar")) {
-				bundles.add(new Bundle(f));
+		for (BundleLoadingFrame.BundleHolder bundleHolder : temp) {
+			if (!bundleHolder.used) {
+				continue;
 			}
-		}
-
-		for (Bundle bundle : bundles) {
+			Bundle bundle = bundleHolder.b;
+			bundles.add(bundle);
 			try {
 				bundle.loadDetails();
 				System.out.println("[BUNDLES] Loaded details for " + bundle.getID() + " : " + bundle.getName());
@@ -242,14 +244,10 @@ public class App implements Runnable, MouseListener, MouseMotionListener, MouseW
 		}
 
 		System.out.println("[REGISTRY] List of all registered object entires");
-		for (ObjectEntry entry : registry.allObjectEntries()) {
-			try {
-				entry.matchTab();
-			} catch (Exception e) {
-				e.printStackTrace();
+		for (BundleRegistry regis : registry.getRegistries().values()) {
+			for (ObjectEntry entry : regis.OBJECT_REGISTRY.values()) {
+				System.out.println("[REGISTRY] -->" + entry.getFullID() + " : " + entry.getName());
 			}
-			System.out.println("[REGISTRY] -->" + entry.getFullID() + " : " + entry.getName() + ", with provider "
-					+ entry.getProvider() + ", with loader " + entry.getLoader());
 		}
 	}
 
@@ -258,19 +256,21 @@ public class App implements Runnable, MouseListener, MouseMotionListener, MouseW
 
 		tabs = new HashMap<String, DefaultMutableTreeNode>();
 		entries = new HashMap<String, DefaultMutableTreeNode>();
-
-		for (ModelTab tab : registry.allModelTabs()) {
-			DefaultMutableTreeNode node = new DefaultMutableTreeNode(tab);
-			tabs.put(tab.getFullID(), node);
-			root.add(node);
+		for (BundleRegistry regis : registry.getRegistries().values()) {
+			for (ModelTab tab : regis.TAB_REGISTRY.values()) {
+				DefaultMutableTreeNode node = new DefaultMutableTreeNode(tab);
+				tabs.put(tab.getFullID(), node);
+				root.add(node);
+			}
 		}
 
-		for (ObjectEntry entry : registry.allObjectEntries()) {
-			DefaultMutableTreeNode node = new DefaultMutableTreeNode(entry);
-			tabs.get(entry.getTab().getFullID()).add(node);
-			entries.put(entry.getFullID(), node);
+		for (BundleRegistry regis : registry.getRegistries().values()) {
+			for (ObjectEntry entry : regis.OBJECT_REGISTRY.values()) {
+				DefaultMutableTreeNode node = new DefaultMutableTreeNode(entry);
+				tabs.get(entry.getFullTab()).add(node);
+				entries.put(entry.getFullID(), node);
+			}
 		}
-
 		tree = new JTree(root);
 	}
 

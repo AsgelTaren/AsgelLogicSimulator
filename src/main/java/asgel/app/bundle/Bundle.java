@@ -37,7 +37,11 @@ public class Bundle {
 		this.desc = obj.get("desc").getAsString();
 		this.main = obj.get("main").getAsString();
 
-		icon = asgel.core.bundle.Utils.loadIcon(Utils.openStreamInJar(file, "logo.png"), 16);
+		try {
+			icon = asgel.core.bundle.Utils.loadIcon(Utils.openStreamInJar(file, "logo.png"), 16);
+		} catch (Exception e) {
+			System.out.println("Failed to load logo.png for" + id);
+		}
 	}
 
 	public void load(BundleRegistry registry) throws Exception {
