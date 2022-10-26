@@ -78,11 +78,11 @@ public class App implements Runnable, MouseListener, MouseMotionListener, MouseW
 
 	private void init() {
 		registry = new GlobalRegistry();
-		
+
 		BundleLoadingPanel bundlePanel = new BundleLoadingPanel();
 		LoadingFrame loadFrame = new LoadingFrame(bundlePanel);
 		loadFrame.showDialog();
-		
+
 		requester = new ParametersRequester(this);
 		bundlePanel.showFrame();
 		loadBundles(bundlePanel.getBundles(), requester);
@@ -336,6 +336,10 @@ public class App implements Runnable, MouseListener, MouseMotionListener, MouseW
 	@Override
 	public void keyReleased(KeyEvent e) {
 		holder.keyReleased(e);
+	}
+
+	public void setModel(Model m) {
+		holder = new ModelHolder(m, this);
 	}
 
 }

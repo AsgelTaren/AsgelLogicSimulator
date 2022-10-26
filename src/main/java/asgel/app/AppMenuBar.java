@@ -2,12 +2,18 @@ package asgel.app;
 
 import java.awt.Desktop;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 
+import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
+import com.google.gson.JsonParser;
+
 import asgel.app.bundle.BundleDialog;
+import asgel.core.model.Model;
 
 @SuppressWarnings("serial")
 public class AppMenuBar extends JMenuBar {
@@ -20,7 +26,51 @@ public class AppMenuBar extends JMenuBar {
 	}
 
 	public void init() {
+		add(createFileMenu());
 		add(createBundleMenu());
+	}
+
+	private JMenu createFileMenu() {
+		JMenu res = new JMenu("File");
+
+		JMenuItem load = new JMenuItem("Load Model");
+		load.addActionListener(e -> {
+			JFileChooser chooser = new JFileChooser();
+			chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+			int choice = chooser.showDialog(app.getJFrame(), "Select");
+			if (choice == JFileChooser.APPROVE_OPTION) {
+				try {
+					Model m = new Model(
+							JsonParser.parseReader(new FileReader(chooser.getSelectedFile())).getAsJsonObject(),
+							app.getRegistry());
+					app.setModel(m);
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+			}
+		});
+		res.add(load);
+
+		JMenuItem saveAs = new JMenuItem("Save As");
+		saveAs.addActionListener(e -> {
+
+			JFileChooser chooser = new JFileChooser();
+			chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+			int choice = chooser.showDialog(app.getJFrame(), "Select");
+			if (choice == JFileChooser.APPROVE_OPTION) {
+				if (!chooser.getSelectedFile().exists()) {
+					try {
+						chooser.getSelectedFile().createNewFile();
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+				}
+				Utils.write(chooser.getSelectedFile(), app.getModelHolder().getModel().convertToJson().toString());
+			}
+		});
+		res.add(saveAs);
+
+		return res;
 	}
 
 	private JMenu createBundleMenu() {
@@ -31,18 +81,18 @@ public class AppMenuBar extends JMenuBar {
 			new BundleDialog(app.getJFrame(), app).showDialog();
 		});
 		res.add(show);
-		
+
 		JMenuItem openFolder = new JMenuItem("Open Bundle folder");
-		openFolder.addActionListener(e ->{
+		openFolder.addActionListener(e -> {
 			try {
 				Desktop.getDesktop().open(new File(System.getenv("APPDATA") + "/AsgelLogicSim/bundles"));
 			} catch (Exception err) {
 				err.printStackTrace();
 			}
-			
+
 		});
 		res.add(openFolder);
-		
+
 		return res;
 	}
 

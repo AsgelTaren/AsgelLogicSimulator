@@ -1,9 +1,11 @@
 package asgel.app;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.JarURLConnection;
 import java.net.URL;
+import java.nio.file.Files;
 
 public class Utils {
 
@@ -16,6 +18,14 @@ public class Utils {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	public static void write(File f, String data) {
+		try {
+			Files.writeString(f.toPath(), data);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

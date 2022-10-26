@@ -112,7 +112,6 @@ public class ModelHolder implements MouseMotionListener, MouseListener, MouseWhe
 		Point mouse = fromCameraToModel(new Point(mousex, mousey));
 		ModelOBJ obj = entry.getProvider().apply(mouse);
 		if (obj != null) {
-			obj.placePins();
 			objToAdd.add(obj);
 			obj.update();
 		}
