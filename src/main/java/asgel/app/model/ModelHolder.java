@@ -56,49 +56,51 @@ public class ModelHolder implements MouseMotionListener, MouseListener, MouseWhe
 	}
 
 	public void render(Renderer renderer) {
-		if (objToAdd.size() > 0) {
-			model.getObjects().addAll(objToAdd);
-			objToAdd = new ArrayList<ModelOBJ>();
+		try {
+			if (objToAdd.size() > 0) {
+				model.getObjects().addAll(objToAdd);
+				objToAdd = new ArrayList<ModelOBJ>();
+			}
+			if (mouseInModel == null)
+				return;
+			renderer.push();
+			renderer.center();
+			renderer.translate(-camx, -camy);
+			renderer.scale(zoom);
+
+			for (ModelOBJ obj : model.getObjects()) {
+				obj.render(renderer, highOBJ, highPin, anchor);
+			}
+
+			renderer.setStroke(3);
+			for (Link l : model.getLinks()) {
+				l.isCoherent();
+				l.render(renderer);
+			}
+
+			if (anchor != null) {
+				renderer.drawLine(anchor.posInModel(),
+						(highPin != null && highPin.getLink() == null && highPin.isInput() != anchor.isInput()
+								&& highPin.getSize() == anchor.getSize()) ? highPin.posInModel() : mouseInModel,
+						Color.BLACK);
+			}
+
+			renderer.pop();
+
+			renderer.drawString("Camera: " + camx + ", " + camy, 15, 15, Color.BLACK);
+			renderer.drawString("Zoom: " + zoom, 15, 30, Color.BLACK);
+			if (highOBJ != null) {
+				renderer.drawString(highOBJ.toString(), 15, 60, Color.BLACK);
+			}
+			if (highPin != null) {
+				renderer.drawString("Pin: " + highPin.toString() + ", " + highPin.getRotation() + " | " + highPin.getX()
+						+ ", " + highPin.getY(), 15, 75, Color.BLACK);
+			}
+
+			renderer.drawString("Mouse: " + mouseInModel.x + ", " + mouseInModel.y, 15, 45, Color.BLACK);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		if (mouseInModel == null)
-			return;
-		renderer.push();
-		renderer.center();
-		renderer.translate(-camx, -camy);
-		renderer.scale(zoom);
-
-		for (ModelOBJ obj : model.getObjects()) {
-			obj.render(renderer, highOBJ, highPin, anchor);
-		}
-
-		for (Link l : model.getLinks()) {
-			l.isCoherent();
-			l.render(renderer);
-		}
-
-		if (anchor != null) {
-			renderer.drawLine(anchor.posInModel(),
-					(highPin != null && highPin.getLink() == null && highPin.isInput() != anchor.isInput()
-							&& highPin.getSize() == anchor.getSize()) ? highPin.posInModel() : mouseInModel,
-					Color.BLACK);
-		}
-
-		renderer.pop();
-
-		renderer.drawString("Camera: " + camx + ", " + camy, 15, 15, Color.BLACK);
-		renderer.drawString("Zoom: " + zoom, 15, 30, Color.BLACK);
-		if (highOBJ != null) {
-			renderer.drawString(highOBJ.toString(), 15, 60, Color.BLACK);
-		}
-
-		renderer.drawString("Mouse: " + mouseInModel.x + ", " + mouseInModel.y, 15, 45, Color.BLACK);
-		for (int i = 0; i < model.getObjects().size(); i++) {
-			ModelOBJ obj = model.getObjects().get(i);
-			renderer.drawString(
-					obj + " : " + obj.getX() + ", " + obj.getY() + ": " + obj.fromModelToObject(mouseInModel), 15,
-					60 + (i + 1) * 15, Color.BLACK);
-		}
-
 	}
 
 	public synchronized void addObject(ObjectEntry entry, int mousex, int mousey) {

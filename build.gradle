@@ -15,3 +15,10 @@ dependencies {
 application {
     mainClass = 'asgel.app.Main'
 }
+
+task jarBundles (type : Jar){
+	dependsOn ":AsgelLogicDefault:jar"
+	dependsOn ":AsgelLogicSignalManip:jar"
+	dependsOn ":AsgelCMOS4000:jar"
+}
+run.dependsOn jarBundles

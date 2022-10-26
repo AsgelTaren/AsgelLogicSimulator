@@ -1,5 +1,6 @@
 package asgel.app.bundle;
 
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -112,6 +113,7 @@ public class BundleLoadingFrame extends JDialog {
 
 		load();
 		pack();
+		setLocationRelativeTo(null);
 
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 	}

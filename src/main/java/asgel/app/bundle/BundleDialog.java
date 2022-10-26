@@ -76,6 +76,7 @@ public class BundleDialog extends JDialog {
 		gbc.gridy = 1;
 		add(contTree, gbc);
 		pack();
+		setLocationRelativeTo(null);
 
 		setResizable(false);
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);

@@ -1,3 +1,9 @@
 rootProject.name = 'AsgelLogicSimulator'
 include ":AsgelLogicCore"
 project(":AsgelLogicCore").projectDir = new File("../AsgelLogicCore/")
+include ":AsgelLogicDefault"
+project(":AsgelLogicDefault").projectDir = new File("../AsgelLogicDefault/")
+include ":AsgelLogicSignalManip"
+project(":AsgelLogicSignalManip").projectDir = new File("../AsgelLogicSignalManip")
+include ":AsgelCMOS4000"
+project(":AsgelCMOS4000").projectDir = new File("../AsgelCMOS4000")
