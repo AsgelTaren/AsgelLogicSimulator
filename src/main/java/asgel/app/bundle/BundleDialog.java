@@ -107,7 +107,7 @@ public class BundleDialog extends JDialog {
 		}
 
 		// Updating the tree
-		contTree.setModel(new DefaultTreeModel(root));
+		((DefaultTreeModel) contTree.getModel()).setRoot(root);
 		contTree.treeDidChange();
 		contTree.revalidate();
 		contTree.repaint();

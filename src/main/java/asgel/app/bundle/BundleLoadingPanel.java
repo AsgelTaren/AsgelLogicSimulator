@@ -1,6 +1,5 @@
 package asgel.app.bundle;
 
-import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -10,9 +9,7 @@ import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -22,18 +19,16 @@ import javax.swing.ListSelectionModel;
 import javax.swing.table.AbstractTableModel;
 
 @SuppressWarnings("serial")
-public class BundleLoadingFrame extends JDialog {
+public class BundleLoadingPanel extends JPanel {
 
 	private ArrayList<BundleHolder> bundles;
 
 	private File dir = new File(System.getenv("APPDATA") + "/AsgelLogicSim/bundles/");
 
-	public BundleLoadingFrame() {
-		super((JFrame) null, "Loading Bundle", true);
+	public BundleLoadingPanel() {
+		super();
 
-		JPanel panel = new JPanel();
-
-		panel.setLayout(new GridBagLayout());
+		setLayout(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.insets = new Insets(5, 5, 5, 5);
 		gbc.gridwidth = 2;
@@ -44,7 +39,7 @@ public class BundleLoadingFrame extends JDialog {
 		table.setDefaultRenderer(Bundle.class, new BundleCellRenderer());
 		table.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-		panel.add(new JScrollPane(table), gbc);
+		add(new JScrollPane(table), gbc);
 
 		JTextArea area = new JTextArea();
 		area.setBorder(BorderFactory.createTitledBorder("Bundle Desc"));
@@ -57,7 +52,7 @@ public class BundleLoadingFrame extends JDialog {
 			}
 		});
 		gbc.gridy = 1;
-		panel.add(area, gbc);
+		add(area, gbc);
 
 		JPanel loc = new JPanel();
 		loc.setLayout(new GridBagLayout());
@@ -65,12 +60,15 @@ public class BundleLoadingFrame extends JDialog {
 
 		gbc.gridx = 0;
 		gbc.gridwidth = 1;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.weightx = 0.8;
 		JTextField dirField = new JTextField(dir.getAbsolutePath());
 		dirField.setPreferredSize(new Dimension(400, 25));
 		dirField.setEditable(false);
 		loc.add(dirField, gbc);
 
 		gbc.gridx = 1;
+		gbc.weightx = 0.2;
 		JButton browse = new JButton("Browse");
 		browse.addActionListener(e -> {
 			JFileChooser chooser = new JFileChooser();
@@ -89,33 +87,14 @@ public class BundleLoadingFrame extends JDialog {
 		gbc.gridy = 2;
 		gbc.gridx = 0;
 		gbc.fill = GridBagConstraints.BOTH;
-		panel.add(loc, gbc);
+		add(loc, gbc);
 
 		gbc.anchor = GridBagConstraints.EAST;
 		gbc.fill = GridBagConstraints.NONE;
 		gbc.gridy = 3;
 		gbc.gridwidth = 1;
 
-		JButton start = new JButton("Start");
-		start.addActionListener(e -> {
-			setVisible(false);
-			dispose();
-		});
-		panel.add(start, gbc);
-
-		gbc.gridx = 1;
-		JButton cancel = new JButton("Cancel");
-		cancel.addActionListener(e -> {
-			System.exit(0);
-		});
-		panel.add(cancel, gbc);
-		setContentPane(panel);
-
 		load();
-		pack();
-		setLocationRelativeTo(null);
-
-		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 	}
 
 	public ArrayList<BundleHolder> getBundles() {
@@ -145,9 +124,9 @@ public class BundleLoadingFrame extends JDialog {
 
 	private class BundleLoadingModel extends AbstractTableModel {
 
-		private BundleLoadingFrame load;
+		private BundleLoadingPanel load;
 
-		private BundleLoadingModel(BundleLoadingFrame load) {
+		private BundleLoadingModel(BundleLoadingPanel load) {
 			super();
 			this.load = load;
 		}
@@ -227,6 +206,11 @@ public class BundleLoadingFrame extends JDialog {
 			this.b = b;
 			this.used = used;
 		}
+	}
+
+	@Override
+	public String toString() {
+		return "Bundles";
 	}
 
 }

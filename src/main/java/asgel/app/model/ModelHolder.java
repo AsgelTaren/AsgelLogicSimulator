@@ -89,15 +89,20 @@ public class ModelHolder implements MouseMotionListener, MouseListener, MouseWhe
 
 			renderer.drawString("Camera: " + camx + ", " + camy, 15, 15, Color.BLACK);
 			renderer.drawString("Zoom: " + zoom, 15, 30, Color.BLACK);
+			renderer.drawString("Mouse: " + mouseInModel.x + ", " + mouseInModel.y, 15, 45, Color.BLACK);
+			renderer.drawString(
+					"Model: " + model.getObjects().size() + " objects and " + model.getLinks().size() + " links", 15,
+					60, Color.BLACK);
+
 			if (highOBJ != null) {
-				renderer.drawString(highOBJ.toString(), 15, 60, Color.BLACK);
-			}
-			if (highPin != null) {
-				renderer.drawString("Pin: " + highPin.toString() + ", " + highPin.getRotation() + " | " + highPin.getX()
-						+ ", " + highPin.getY(), 15, 75, Color.BLACK);
+				renderer.drawString(highOBJ.toString(), 15, 75, Color.BLACK);
 			}
 
-			renderer.drawString("Mouse: " + mouseInModel.x + ", " + mouseInModel.y, 15, 45, Color.BLACK);
+			if (highPin != null) {
+				renderer.drawString("Pin: " + highPin.toString() + ", " + highPin.getRotation() + " | " + highPin.getX()
+						+ ", " + highPin.getY(), 15, 90, Color.BLACK);
+			}
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -107,6 +112,7 @@ public class ModelHolder implements MouseMotionListener, MouseListener, MouseWhe
 		Point mouse = fromCameraToModel(new Point(mousex, mousey));
 		ModelOBJ obj = entry.getProvider().apply(mouse);
 		if (obj != null) {
+			obj.placePins();
 			objToAdd.add(obj);
 			obj.update();
 		}
@@ -140,6 +146,12 @@ public class ModelHolder implements MouseMotionListener, MouseListener, MouseWhe
 				delta = highOBJ.getPos().sub(mouseInModel);
 			} else if (highPin != null && highPin.getLink() == null) {
 				anchor = highPin;
+			}
+		} else if (SwingUtilities.isRightMouseButton(e)) {
+			if (highOBJ != null) {
+				PopupUtils.forModelOBJ(this, highOBJ).show(e.getComponent(), e.getX(), e.getY());
+			} else if (highPin != null) {
+				PopupUtils.forPin(this, highPin).show(e.getComponent(), e.getX(), e.getY());
 			}
 		}
 	}
@@ -233,6 +245,14 @@ public class ModelHolder implements MouseMotionListener, MouseListener, MouseWhe
 	@Override
 	public void keyReleased(KeyEvent e) {
 
+	}
+
+	public App getApp() {
+		return app;
+	}
+
+	public Model getModel() {
+		return model;
 	}
 
 }

@@ -26,7 +26,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
 import asgel.app.bundle.Bundle;
-import asgel.app.bundle.BundleLoadingFrame;
+import asgel.app.bundle.BundleLoadingPanel;
 import asgel.app.model.ModelHolder;
 import asgel.app.model.OBJTreeDropTarget;
 import asgel.app.model.OBJTreeRenderer;
@@ -78,10 +78,14 @@ public class App implements Runnable, MouseListener, MouseMotionListener, MouseW
 
 	private void init() {
 		registry = new GlobalRegistry();
-		BundleLoadingFrame load = new BundleLoadingFrame();
+		
+		BundleLoadingPanel bundlePanel = new BundleLoadingPanel();
+		LoadingFrame loadFrame = new LoadingFrame(bundlePanel);
+		loadFrame.showDialog();
+		
 		requester = new ParametersRequester(this);
-		load.showFrame();
-		loadBundles(load.getBundles(), requester);
+		bundlePanel.showFrame();
+		loadBundles(bundlePanel.getBundles(), requester);
 
 		frame = new JFrame("AsgelLogicSimulator origins");
 		frame.setVisible(true);
@@ -223,10 +227,10 @@ public class App implements Runnable, MouseListener, MouseMotionListener, MouseW
 		}
 	}
 
-	private void loadBundles(ArrayList<BundleLoadingFrame.BundleHolder> temp, IParametersRequester req) {
+	private void loadBundles(ArrayList<BundleLoadingPanel.BundleHolder> temp, IParametersRequester req) {
 		bundles = new ArrayList<Bundle>();
 
-		for (BundleLoadingFrame.BundleHolder bundleHolder : temp) {
+		for (BundleLoadingPanel.BundleHolder bundleHolder : temp) {
 			if (!bundleHolder.used) {
 				continue;
 			}
