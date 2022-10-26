@@ -35,6 +35,7 @@ import asgel.core.gfx.Renderer;
 import asgel.core.model.BundleRegistry;
 import asgel.core.model.BundleRegistry.ObjectEntry;
 import asgel.core.model.GlobalRegistry;
+import asgel.core.model.IParametersRequester;
 import asgel.core.model.Model;
 import asgel.core.model.ModelTab;
 
@@ -68,6 +69,9 @@ public class App implements Runnable, MouseListener, MouseMotionListener, MouseW
 	// App Menu Bar
 	private AppMenuBar menubar;
 
+	// Parameters requester
+	private ParametersRequester requester;
+
 	public App() {
 
 	}
@@ -75,8 +79,9 @@ public class App implements Runnable, MouseListener, MouseMotionListener, MouseW
 	private void init() {
 		registry = new GlobalRegistry();
 		BundleLoadingFrame load = new BundleLoadingFrame();
+		requester = new ParametersRequester(this);
 		load.showFrame();
-		loadBundles(load.getBundles());
+		loadBundles(load.getBundles(), requester);
 
 		frame = new JFrame("AsgelLogicSimulator origins");
 		frame.setVisible(true);
@@ -218,7 +223,7 @@ public class App implements Runnable, MouseListener, MouseMotionListener, MouseW
 		}
 	}
 
-	private void loadBundles(ArrayList<BundleLoadingFrame.BundleHolder> temp) {
+	private void loadBundles(ArrayList<BundleLoadingFrame.BundleHolder> temp, IParametersRequester req) {
 		bundles = new ArrayList<Bundle>();
 
 		for (BundleLoadingFrame.BundleHolder bundleHolder : temp) {
@@ -236,7 +241,7 @@ public class App implements Runnable, MouseListener, MouseMotionListener, MouseW
 			BundleRegistry reg = new BundleRegistry(bundle.getID());
 			registry.getRegistries().put(bundle.getID(), reg);
 			try {
-				bundle.load(reg);
+				bundle.load(reg, req);
 				System.out.println("[BUNDLES] Loaded " + bundle.getID());
 			} catch (Exception e) {
 				e.printStackTrace();

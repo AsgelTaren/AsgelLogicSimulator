@@ -13,6 +13,7 @@ import com.google.gson.JsonParser;
 import asgel.app.Utils;
 import asgel.core.bundle.RessourceManager;
 import asgel.core.model.BundleRegistry;
+import asgel.core.model.IParametersRequester;
 
 public class Bundle {
 
@@ -44,13 +45,14 @@ public class Bundle {
 		}
 	}
 
-	public void load(BundleRegistry registry) throws Exception {
+	public void load(BundleRegistry registry, IParametersRequester requester) throws Exception {
 		URLClassLoader child = new URLClassLoader(new URL[] { file.toURI().toURL() }, this.getClass().getClassLoader());
 		Class<?> bundle = Class.forName(main + ".Bundle", true, child);
-		Method method = bundle.getDeclaredMethod("loadBundle", BundleRegistry.class, RessourceManager.class);
+		Method method = bundle.getDeclaredMethod("loadBundle", BundleRegistry.class, RessourceManager.class,
+				IParametersRequester.class);
 		Object instance = bundle.getConstructor().newInstance();
 		RessourceManager res = new RessourceManager(bundle);
-		method.invoke(instance, registry, res);
+		method.invoke(instance, registry, res, requester);
 	}
 
 	public String getDesc() {
