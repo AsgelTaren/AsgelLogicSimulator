@@ -33,6 +33,7 @@ public class ModelHolder implements MouseMotionListener, MouseListener, MouseWhe
 
 	// Camera pos
 	private float camx, camy, zoom = 1.0f;
+	private Point old;
 
 	// App reference
 	private App app;
@@ -145,6 +146,8 @@ public class ModelHolder implements MouseMotionListener, MouseListener, MouseWhe
 				delta = highOBJ.getPos().sub(mouseInModel);
 			} else if (highPin != null && highPin.getLink() == null) {
 				anchor = highPin;
+			} else {
+				old = new Point(e.getX(), e.getY());
 			}
 		} else if (SwingUtilities.isRightMouseButton(e)) {
 			if (highOBJ != null) {
@@ -189,6 +192,12 @@ public class ModelHolder implements MouseMotionListener, MouseListener, MouseWhe
 				if (highPin == anchor) {
 					highPin = null;
 				}
+			} else {
+				Point n = new Point(e.getX(), e.getY());
+				Point temp = old.sub(n);
+				camx += temp.x;
+				camy += temp.y;
+				old = n;
 			}
 		}
 		if (SwingUtilities.isMiddleMouseButton(e)) {
