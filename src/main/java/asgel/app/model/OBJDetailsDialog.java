@@ -15,6 +15,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
 import javax.swing.text.NumberFormatter;
 
 import asgel.core.gfx.Direction;
@@ -73,6 +74,7 @@ public class OBJDetailsDialog extends JDialog {
 			JFormattedTextField xfield = new JFormattedTextField(formatter);
 			xfield.setPreferredSize(new Dimension(150, 25));
 			xfield.setText(obj.getX() + "");
+			xfield.setEnabled(obj.isMoveable());
 			xfield.addActionListener(e -> {
 				obj.setX(Integer.parseInt(xfield.getText()));
 			});
@@ -89,6 +91,7 @@ public class OBJDetailsDialog extends JDialog {
 			yfield.addActionListener(e -> {
 				obj.setY(Integer.parseInt(yfield.getText()));
 			});
+			yfield.setEnabled(obj.isMoveable());
 			gbc.gridx = 3;
 			pos.add(yfield, gbc);
 
@@ -103,10 +106,28 @@ public class OBJDetailsDialog extends JDialog {
 			JComboBox<Direction> rotcomb = new JComboBox<>(Direction.values());
 			rotcomb.setSelectedItem(obj.getRotation());
 			rotcomb.addActionListener(e -> obj.setRotation((Direction) rotcomb.getSelectedItem()));
+			rotcomb.setEnabled(obj.isMoveable());
 			gbc.gridx = 2;
 			pos.add(rotcomb, gbc);
 
 			add(pos);
+
+			JPanel desc = new JPanel();
+			desc.setBorder(BorderFactory.createTitledBorder("Name and others"));
+			desc.setLayout(new GridBagLayout());
+			gbc.gridheight = gbc.gridwidth = 1;
+			gbc.gridx = gbc.gridy = 0;
+			desc.add(new JLabel("Name"), gbc);
+
+			JTextField namefield = new JTextField(obj.toString());
+			namefield.setPreferredSize(new Dimension(150, 25));
+			namefield.addActionListener(e -> {
+				obj.setName(namefield.getText());
+			});
+			gbc.gridx = 1;
+			desc.add(namefield, gbc);
+
+			add(desc);
 		}
 
 	}

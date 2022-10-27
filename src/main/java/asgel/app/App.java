@@ -91,7 +91,7 @@ public class App implements Runnable, MouseListener, MouseMotionListener, MouseW
 		frame.setVisible(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		renderer = new Renderer(1600, 900, 10);
+		renderer = new Renderer(1600, 900, 18);
 		frame.add(renderer);
 		renderer.create();
 		renderer.addMouseListener(this);

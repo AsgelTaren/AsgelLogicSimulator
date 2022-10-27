@@ -43,6 +43,13 @@ public class ModelHolder implements MouseMotionListener, MouseListener, MouseWhe
 	private Pin highPin, anchor;
 	private Point delta;
 
+	// Link path
+	private ArrayList<Point> linkPath;
+	private Link targetLink;
+	private Pin targetPin;
+	private Point nextToPath;
+	private boolean horizontal;
+
 	// Mouse
 	private Point mouseInModel;
 
@@ -75,8 +82,14 @@ public class ModelHolder implements MouseMotionListener, MouseListener, MouseWhe
 
 			renderer.setStroke(3);
 			for (Link l : model.getLinks()) {
-				l.isCoherent();
-				l.render(renderer);
+				if (l != targetLink)
+					l.render(renderer);
+			}
+			if (targetLink != null) {
+				for (int i = 0; i < linkPath.size() - 1; i++) {
+					renderer.drawLine(linkPath.get(i), linkPath.get(i + 1), Color.BLACK);
+				}
+				renderer.drawLine(linkPath.get(linkPath.size() - 1), nextToPath, Color.BLACK);
 			}
 
 			if (anchor != null) {
@@ -142,20 +155,54 @@ public class ModelHolder implements MouseMotionListener, MouseListener, MouseWhe
 	@Override
 	public void mousePressed(MouseEvent e) {
 		if (SwingUtilities.isLeftMouseButton(e)) {
-			if (highOBJ != null) {
+			if (targetLink != null) {
+				linkPath.add(nextToPath);
+				nextToPath = new Point(mouseInModel);
+				horizontal = !horizontal;
+				if (highPin == targetPin) {
+					linkPath.add(highPin.posInModel());
+					targetLink.setPath(linkPath);
+					targetLink = null;
+					linkPath = null;
+					targetPin = null;
+					nextToPath = null;
+					delta = null;
+				}
+				return;
+			}
+			if (highOBJ != null && highOBJ.isMoveable()) {
 				delta = highOBJ.getPos().sub(mouseInModel);
+				for (Pin p : highOBJ.getPins()) {
+					if (p.getLink() != null) {
+						p.getLink().setPath(null);
+					}
+				}
+				return;
 			} else if (highPin != null && highPin.getLink() == null) {
 				anchor = highPin;
+
 			} else {
 				old = new Point(e.getX(), e.getY());
 			}
+			delta = null;
 		} else if (SwingUtilities.isRightMouseButton(e)) {
 			if (highOBJ != null) {
 				PopupUtils.forModelOBJ(this, highOBJ).show(e.getComponent(), e.getX(), e.getY());
 			} else if (highPin != null) {
 				PopupUtils.forPin(this, highPin).show(e.getComponent(), e.getX(), e.getY());
 			}
+		} else if (SwingUtilities.isMiddleMouseButton(e)) {
+			if (highPin != null && highPin.getLink() != null && !highPin.getModelOBJ().isMoveable()
+					&& targetLink == null && !highPin.getLink().getOther(highPin).getModelOBJ().isMoveable()) {
+				targetLink = highPin.getLink();
+				linkPath = new ArrayList<Point>();
+				linkPath.add(highPin.posInModel());
+				nextToPath = highPin.posInModel();
+				horizontal = ((highPin.getRealRotation().ordinal() & 1) == 0);
+				targetPin = targetLink.getOther(highPin);
+			}
 		}
+
 	}
 
 	@Override
@@ -169,6 +216,7 @@ public class ModelHolder implements MouseMotionListener, MouseListener, MouseWhe
 			model.refresh(temp);
 		}
 		anchor = null;
+		delta = null;
 	}
 
 	@Override
@@ -185,8 +233,12 @@ public class ModelHolder implements MouseMotionListener, MouseListener, MouseWhe
 	public void mouseDragged(MouseEvent e) {
 		mouseInModel = fromCameraToModel(new Point(e.getX(), e.getY()));
 		if (SwingUtilities.isLeftMouseButton(e)) {
-			if (highOBJ != null && anchor == null) {
+			if (highOBJ != null && anchor == null && delta != null) {
 				highOBJ.setPos(delta.add(mouseInModel));
+				if (e.isControlDown()) {
+					highOBJ.setX(highOBJ.getX() / 5 * 5);
+					highOBJ.setY(highOBJ.getY() / 5 * 5);
+				}
 			} else if (anchor != null) {
 				refreshHigh();
 				if (highPin == anchor) {
@@ -209,6 +261,22 @@ public class ModelHolder implements MouseMotionListener, MouseListener, MouseWhe
 	public void mouseMoved(MouseEvent e) {
 		mouseInModel = fromCameraToModel(new Point(e.getX(), e.getY()));
 		refreshHigh();
+
+		if (targetLink != null) {
+			if (highPin == targetPin) {
+				if (horizontal) {
+					nextToPath.x = highPin.posInModel().x;
+				} else {
+					nextToPath.y = highPin.posInModel().y;
+				}
+			} else {
+				if (horizontal) {
+					nextToPath.x = mouseInModel.x;
+				} else {
+					nextToPath.y = mouseInModel.y;
+				}
+			}
+		}
 	}
 
 	private void refreshHigh() {
@@ -248,8 +316,13 @@ public class ModelHolder implements MouseMotionListener, MouseListener, MouseWhe
 				model.refresh(ref);
 			}
 		}
-		if (e.getKeyCode() == KeyEvent.VK_R && highOBJ != null) {
+		if (e.getKeyCode() == KeyEvent.VK_R && highOBJ != null && highOBJ.isMoveable()) {
 			highOBJ.setRotation(highOBJ.getRotation().next());
+			for (Pin p : highOBJ.getPins()) {
+				if (p.getLink() != null) {
+					p.getLink().setPath(null);
+				}
+			}
 		}
 
 	}

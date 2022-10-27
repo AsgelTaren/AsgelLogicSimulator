@@ -2,6 +2,7 @@ package asgel.app.model;
 
 import java.util.ArrayList;
 
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -17,6 +18,14 @@ public class PopupUtils {
 
 		JMenuItem setName = new JMenuItem("Set Name");
 		menu.add(setName);
+
+		JCheckBoxMenuItem moveable = new JCheckBoxMenuItem("Moveable");
+		moveable.setSelected(obj.isMoveable());
+		moveable.addActionListener(e -> {
+			obj.setMoveable(moveable.isSelected());
+		});
+
+		menu.add(moveable);
 
 		JMenuItem showDetails = new JMenuItem("Show Details");
 		showDetails.addActionListener(e -> {
@@ -72,6 +81,13 @@ public class PopupUtils {
 			p.setLink(null);
 		});
 		menu.add(remove);
+
+		JMenuItem removeLinkPath = new JMenuItem("Remove Link Path");
+		removeLinkPath.setEnabled(p.getLink() != null);
+		removeLinkPath.addActionListener(e -> {
+			p.getLink().setPath(null);
+		});
+		menu.add(removeLinkPath);
 
 		return menu;
 	}
