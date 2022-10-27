@@ -13,6 +13,7 @@ import com.google.gson.JsonParser;
 import asgel.app.Utils;
 import asgel.core.bundle.RessourceManager;
 import asgel.core.model.BundleRegistry;
+import asgel.core.model.GlobalRegistry;
 import asgel.core.model.IParametersRequester;
 
 public class Bundle {
@@ -45,13 +46,13 @@ public class Bundle {
 		}
 	}
 
-	public void load(BundleRegistry registry, IParametersRequester requester) throws Exception {
+	public void load(BundleRegistry registry, IParametersRequester requester, GlobalRegistry regis) throws Exception {
 		URLClassLoader child = new URLClassLoader(new URL[] { file.toURI().toURL() }, this.getClass().getClassLoader());
 		Class<?> bundle = Class.forName(main + ".Bundle", true, child);
 		Method method = bundle.getDeclaredMethod("loadBundle", BundleRegistry.class, RessourceManager.class,
 				IParametersRequester.class);
 		Object instance = bundle.getConstructor().newInstance();
-		RessourceManager res = new RessourceManager(bundle);
+		RessourceManager res = new RessourceManager(bundle, regis);
 		method.invoke(instance, registry, res, requester);
 	}
 

@@ -245,7 +245,7 @@ public class App implements Runnable, MouseListener, MouseMotionListener, MouseW
 			BundleRegistry reg = new BundleRegistry(bundle.getID());
 			registry.getRegistries().put(bundle.getID(), reg);
 			try {
-				bundle.load(reg, req);
+				bundle.load(reg, req, registry);
 				System.out.println("[BUNDLES] Loaded " + bundle.getID());
 			} catch (Exception e) {
 				e.printStackTrace();

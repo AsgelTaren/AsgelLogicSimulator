@@ -238,6 +238,9 @@ public class ModelHolder implements MouseMotionListener, MouseListener, MouseWhe
 				model.refresh(ref);
 			}
 		}
+		if (e.getKeyCode() == KeyEvent.VK_R && highOBJ != null) {
+			highOBJ.setRotation(highOBJ.getRotation().next());
+		}
 
 	}
 

@@ -6,9 +6,11 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -124,6 +126,18 @@ public class ParametersRequester implements IParametersRequester {
 			return res;
 		}
 
+	}
+
+	@Override
+	public File getFile(File startDir) {
+		JFileChooser chooser = new JFileChooser();
+		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		chooser.setCurrentDirectory(startDir);
+		int choice = chooser.showOpenDialog(app.getJFrame());
+		if (choice == JFileChooser.APPROVE_OPTION) {
+			return chooser.getSelectedFile();
+		}
+		return null;
 	}
 
 }
