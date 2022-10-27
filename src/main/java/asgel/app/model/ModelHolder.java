@@ -226,6 +226,7 @@ public class ModelHolder implements MouseMotionListener, MouseListener, MouseWhe
 				}
 				if (obj.containsFromObject(point, 0)) {
 					highOBJ = obj;
+					highOBJ.updateMousePos(point);
 					return;
 				}
 			}
