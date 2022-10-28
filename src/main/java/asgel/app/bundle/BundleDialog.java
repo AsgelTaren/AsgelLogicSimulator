@@ -69,7 +69,7 @@ public class BundleDialog extends JDialog {
 			if (table.getSelectedRow() < 0 || !e.getValueIsAdjusting())
 				return;
 			Bundle bundle = (Bundle) table.getModel().getValueAt(table.getSelectedRow(), 0);
-			BundleRegistry regis = app.getRegistry().getRegistries().get(bundle.getID());
+			BundleRegistry regis = app.getGlobalRegistry().getRegistries().get(bundle.getID());
 			updateTree(bundle, regis);
 		});
 

@@ -1,7 +1,10 @@
 package asgel.app.model;
 
 import java.awt.Color;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.datatransfer.DataFlavor;
+import java.awt.dnd.DropTarget;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -9,8 +12,10 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.io.File;
 import java.util.ArrayList;
 
+import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import asgel.app.App;
@@ -23,7 +28,13 @@ import asgel.core.model.Model;
 import asgel.core.model.ModelOBJ;
 import asgel.core.model.Pin;
 
-public class ModelHolder implements MouseMotionListener, MouseListener, MouseWheelListener, KeyListener {
+@SuppressWarnings("serial")
+public class ModelHolder extends JPanel
+		implements MouseMotionListener, MouseListener, MouseWheelListener, KeyListener, Runnable {
+
+	// Thread
+	private Thread thread;
+	private boolean running = false;
 
 	// OBJ Flavor
 	public static final DataFlavor OBJFLAVOR = new DataFlavor(ObjectEntry.class, "Flavor for object registry");
@@ -51,20 +62,86 @@ public class ModelHolder implements MouseMotionListener, MouseListener, MouseWhe
 	private boolean horizontal;
 
 	// Mouse
-	private Point mouseInModel;
+	private Point mouseInModel = new Point(0, 0);
 
 	// To Add
 	private ArrayList<ModelOBJ> objToAdd;
 
-	public ModelHolder(Model model, App app) {
+	// Renderer
+	private Renderer renderer;
+
+	// Name
+	private String name;
+	private File file;
+
+	public ModelHolder(Model model, App app, String name, File f) {
+		super();
 		this.model = model;
 		this.app = app;
-
+		this.name = name;
+		this.file = f;
 		objToAdd = new ArrayList<ModelOBJ>();
+
+		setLayout(new GridBagLayout());
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.weightx = gbc.weighty = 1;
+
+		renderer = new Renderer(18);
+		add(renderer, gbc);
+
+		@SuppressWarnings("unused")
+		DropTarget target = new DropTarget(renderer, new OBJTreeDropTarget(this));
+		renderer.addMouseListener(this);
+		renderer.addMouseMotionListener(this);
+		renderer.addMouseWheelListener(this);
+		renderer.addKeyListener(this);
 	}
 
-	public void render(Renderer renderer) {
+	@Override
+	public void run() {
+
+		double FPS = 60.0;
+		double time = 1_000_000_000 / FPS;
+		double delta = 0;
+		long last = System.nanoTime(), now;
+		while (running) {
+			now = System.nanoTime();
+			delta += (now - last) / time;
+			if (delta >= 1) {
+				delta--;
+				render();
+			}
+			now = last;
+		}
+	}
+
+	public synchronized void start() {
+		if (running)
+			return;
+		running = true;
+		thread = new Thread(this);
+		thread.start();
+	}
+
+	public synchronized void stop() {
+		if (!running)
+			return;
+		running = false;
 		try {
+			thread.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void render() {
+		try {
+			if (!renderer.begin()) {
+				System.out.println("Error while trying to begin rendering for " + name);
+				return;
+			}
+			renderer.begin();
 			if (objToAdd.size() > 0) {
 				model.getObjects().addAll(objToAdd);
 				objToAdd = new ArrayList<ModelOBJ>();
@@ -116,10 +193,11 @@ public class ModelHolder implements MouseMotionListener, MouseListener, MouseWhe
 				renderer.drawString("Pin: " + highPin.toString() + ", " + highPin.getRotation() + " | " + highPin.getX()
 						+ ", " + highPin.getY(), 15, 90, Color.BLACK);
 			}
-
+			renderer.end();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
 	}
 
 	public synchronized void addObject(ObjectEntry entry, int mousex, int mousey) {
@@ -132,18 +210,17 @@ public class ModelHolder implements MouseMotionListener, MouseListener, MouseWhe
 	}
 
 	public Point fromCameraToModel(Point p) {
-		return new Point((p.x + camx - (app.getRenderer().getWidth() >> 1)) / zoom,
-				(p.y + camy - (app.getRenderer().getHeight() >> 1)) / zoom);
+		return new Point((p.x + camx - (renderer.getWidth() >> 1)) / zoom,
+				(p.y + camy - (renderer.getHeight() >> 1)) / zoom);
 	}
 
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
 		float oldzoom = zoom;
 		zoom *= (float) Math.pow(1.15, e.getWheelRotation());
-		camx = (app.getRenderer().getWidth() >> 1) - e.getX()
-				+ zoom / oldzoom * (e.getX() + camx - (app.getRenderer().getWidth() >> 1));
-		camy = (app.getRenderer().getHeight() >> 1) - e.getY()
-				+ zoom / oldzoom * (e.getY() + camy - (app.getRenderer().getHeight() >> 1));
+		camx = (renderer.getWidth() >> 1) - e.getX() + zoom / oldzoom * (e.getX() + camx - (renderer.getWidth() >> 1));
+		camy = (renderer.getHeight() >> 1) - e.getY()
+				+ zoom / oldzoom * (e.getY() + camy - (renderer.getHeight() >> 1));
 		refreshHigh();
 	}
 
@@ -187,7 +264,7 @@ public class ModelHolder implements MouseMotionListener, MouseListener, MouseWhe
 			delta = null;
 		} else if (SwingUtilities.isRightMouseButton(e)) {
 			if (highOBJ != null) {
-				PopupUtils.forModelOBJ(this, highOBJ).show(e.getComponent(), e.getX(), e.getY());
+				PopupUtils.forModelOBJ(this, highOBJ, app).show(e.getComponent(), e.getX(), e.getY());
 			} else if (highPin != null) {
 				PopupUtils.forPin(this, highPin).show(e.getComponent(), e.getX(), e.getY());
 			}
@@ -336,8 +413,25 @@ public class ModelHolder implements MouseMotionListener, MouseListener, MouseWhe
 		return app;
 	}
 
+	public Renderer getRenderer() {
+		return renderer;
+	}
+
 	public Model getModel() {
 		return model;
+	}
+
+	public File getFile() {
+		return file;
+	}
+
+	public void setFile(File f) {
+		this.file = f;
+	}
+
+	@Override
+	public String toString() {
+		return file != null ? file.getName() : name;
 	}
 
 }

@@ -6,15 +6,14 @@ import java.awt.dnd.DropTargetDropEvent;
 import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
 
-import asgel.app.App;
 import asgel.core.model.BundleRegistry.ObjectEntry;
 
 public class OBJTreeDropTarget implements DropTargetListener {
 
-	private App app;
+	private ModelHolder holder;
 
-	public OBJTreeDropTarget(App app) {
-		this.app = app;
+	public OBJTreeDropTarget(ModelHolder holder) {
+		this.holder = holder;
 	}
 
 	@Override
@@ -46,8 +45,8 @@ public class OBJTreeDropTarget implements DropTargetListener {
 		dtde.acceptDrop(DnDConstants.ACTION_MOVE);
 		java.awt.Point mouse = dtde.getLocation();
 		try {
-			app.getModelHolder().addObject((ObjectEntry) dtde.getTransferable().getTransferData(ModelHolder.OBJFLAVOR),
-					mouse.x, mouse.y);
+			holder.addObject((ObjectEntry) dtde.getTransferable().getTransferData(ModelHolder.OBJFLAVOR), mouse.x,
+					mouse.y);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

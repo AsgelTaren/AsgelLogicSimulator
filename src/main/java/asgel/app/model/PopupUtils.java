@@ -7,13 +7,14 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
+import asgel.app.App;
 import asgel.core.model.Link;
 import asgel.core.model.ModelOBJ;
 import asgel.core.model.Pin;
 
 public class PopupUtils {
 
-	public static final JPopupMenu forModelOBJ(ModelHolder holder, ModelOBJ obj) {
+	public static final JPopupMenu forModelOBJ(ModelHolder holder, ModelOBJ obj, App app) {
 		JPopupMenu menu = new JPopupMenu();
 
 		JMenuItem setName = new JMenuItem("Set Name");
@@ -54,7 +55,7 @@ public class PopupUtils {
 		});
 		menu.add(remove);
 
-		JMenu custom = obj.getPopupMenu();
+		JMenu custom = obj.getPopupMenu(app);
 		if (custom != null) {
 			menu.add(custom);
 		}

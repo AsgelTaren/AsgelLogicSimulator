@@ -42,14 +42,20 @@ public class AppMenuBar extends JMenuBar {
 				try {
 					Model m = new Model(
 							JsonParser.parseReader(new FileReader(chooser.getSelectedFile())).getAsJsonObject(),
-							app.getRegistry());
-					app.setModel(m);
+							app.getGlobalRegistry());
+					app.setModel(m, chooser.getSelectedFile());
 				} catch (Exception ex) {
 					ex.printStackTrace();
 				}
 			}
 		});
 		res.add(load);
+
+		JMenuItem create = new JMenuItem("New Model");
+		create.addActionListener(e -> {
+			app.setModel(new Model(), null);
+		});
+		res.add(create);
 
 		JMenuItem saveAs = new JMenuItem("Save As");
 		saveAs.addActionListener(e -> {
@@ -65,7 +71,8 @@ public class AppMenuBar extends JMenuBar {
 						e1.printStackTrace();
 					}
 				}
-				Utils.write(chooser.getSelectedFile(), app.getModelHolder().getModel().convertToJson().toString());
+				Utils.write(chooser.getSelectedFile(),
+						app.getSelectedModelHolder().getModel().convertToJson().toString());
 			}
 		});
 		res.add(saveAs);
