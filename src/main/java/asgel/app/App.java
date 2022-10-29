@@ -132,6 +132,11 @@ public class App implements IApp {
 
 		frame.add(right, BorderLayout.EAST);
 
+		// MenuBar
+		menubar = new AppMenuBar(this);
+		menubar.init();
+		frame.setJMenuBar(menubar);
+
 		holderTabs = new JTabbedPane();
 		holderTabs.setPreferredSize(new Dimension(1650, 950));
 		holderTabs.addChangeListener(e -> {
@@ -139,17 +144,15 @@ public class App implements IApp {
 				previous.stop();
 			}
 			previous = (ModelHolder) holderTabs.getSelectedComponent();
-			previous.start();
+			if (previous != null)
+				previous.start();
+			menubar.updateOnChange();
 		});
 		frame.add(holderTabs, BorderLayout.CENTER);
 
-		// MenuBar
-		menubar = new AppMenuBar(this);
-		menubar.init();
-		frame.setJMenuBar(menubar);
-
 		frame.pack();
 		frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+		menubar.updateOnChange();
 	}
 
 	public JTree getTree() {
@@ -233,6 +236,10 @@ public class App implements IApp {
 		holderTabs.add(holder.toString(), holder);
 		holderTabs.setSelectedComponent(holder);
 		holderTabs.repaint();
+	}
+
+	public JTabbedPane getHolderTabs() {
+		return holderTabs;
 	}
 
 }

@@ -13,12 +13,15 @@ import javax.swing.JMenuItem;
 import com.google.gson.JsonParser;
 
 import asgel.app.bundle.BundleDialog;
+import asgel.app.model.ModelHolder;
 import asgel.core.model.Model;
 
 @SuppressWarnings("serial")
 public class AppMenuBar extends JMenuBar {
 
 	private App app;
+
+	private JMenuItem saveAs, save, close;
 
 	public AppMenuBar(App app) {
 		super();
@@ -57,7 +60,7 @@ public class AppMenuBar extends JMenuBar {
 		});
 		res.add(create);
 
-		JMenuItem saveAs = new JMenuItem("Save As");
+		saveAs = new JMenuItem("Save As");
 		saveAs.addActionListener(e -> {
 
 			JFileChooser chooser = new JFileChooser();
@@ -73,9 +76,28 @@ public class AppMenuBar extends JMenuBar {
 				}
 				Utils.write(chooser.getSelectedFile(),
 						app.getSelectedModelHolder().getModel().convertToJson().toString());
+				app.getSelectedModelHolder().setFile(chooser.getSelectedFile());
 			}
 		});
 		res.add(saveAs);
+
+		save = new JMenuItem("Save");
+		save.addActionListener(e -> {
+			ModelHolder holder = app.getSelectedModelHolder();
+			if (holder.getFile() != null) {
+				Utils.write(holder.getFile(), holder.getModel().convertToJson().toString());
+			}
+		});
+		res.add(save);
+
+		close = new JMenuItem("Close Model");
+		close.addActionListener(e -> {
+			app.getHolderTabs().remove(app.getSelectedModelHolder());
+			app.getHolderTabs().repaint();
+			app.getJFrame().revalidate();
+			app.getJFrame().repaint();
+		});
+		res.add(close);
 
 		return res;
 	}
@@ -101,6 +123,13 @@ public class AppMenuBar extends JMenuBar {
 		res.add(openFolder);
 
 		return res;
+	}
+
+	public void updateOnChange() {
+		saveAs.setEnabled(app.getSelectedModelHolder() != null);
+		save.setEnabled(app.getSelectedModelHolder() != null && app.getSelectedModelHolder().getFile() != null);
+		close.setEnabled(app.getSelectedModelHolder() != null);
+
 	}
 
 }

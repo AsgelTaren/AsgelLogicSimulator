@@ -36,7 +36,8 @@ public class OBJTreeRenderer extends DefaultTreeCellRenderer {
 		res.setFont(defFont);
 		res.setText(value.toString());
 		res.setForeground(null);
-		Object data = ((DefaultMutableTreeNode) value).getUserObject();
+		DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
+		Object data = node.getUserObject();
 		if (data instanceof ModelTab tab) {
 			res.setToolTipText(tab.getFullID());
 			res.setIcon(tab.getIcon());
@@ -47,6 +48,8 @@ public class OBJTreeRenderer extends DefaultTreeCellRenderer {
 			if (searchResult.contains(entry)) {
 				res.setForeground(Color.GREEN);
 			}
+			res.setIcon(((ModelTab) ((DefaultMutableTreeNode) node.getParent()).getUserObject()).getIcon());
+
 		}
 		return res;
 	}
