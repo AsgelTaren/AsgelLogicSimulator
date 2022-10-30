@@ -40,6 +40,7 @@ public class AppMenuBar extends JMenuBar {
 		JMenuItem load = new JMenuItem("Load Model");
 		load.addActionListener(e -> {
 			JFileChooser chooser = new JFileChooser();
+			chooser.setCurrentDirectory(app.getWorkingDir());
 			chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 			int choice = chooser.showDialog(app.getJFrame(), "Select");
 			if (choice == JFileChooser.APPROVE_OPTION) {
@@ -66,6 +67,7 @@ public class AppMenuBar extends JMenuBar {
 
 			JFileChooser chooser = new JFileChooser();
 			chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+			chooser.setCurrentDirectory(app.getWorkingDir());
 			int choice = chooser.showDialog(app.getJFrame(), "Select");
 			if (choice == JFileChooser.APPROVE_OPTION) {
 				if (!chooser.getSelectedFile().exists()) {

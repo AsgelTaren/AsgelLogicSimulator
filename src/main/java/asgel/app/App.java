@@ -62,7 +62,7 @@ public class App implements IApp {
 	private ParametersRequester requester;
 
 	// Working dir
-	private File workingDir = new File("./res/");
+	private File workingDir;
 
 	public App() {
 
@@ -73,9 +73,16 @@ public class App implements IApp {
 		registry = new GlobalRegistry();
 		Logger.INSTANCE.log("Created Global Registry");
 
+		LoadingFrame loadFrame = new LoadingFrame();
+		WorkingDirPanel dirPanel = new WorkingDirPanel(loadFrame);
 		BundleLoadingPanel bundlePanel = new BundleLoadingPanel();
-		LoadingFrame loadFrame = new LoadingFrame(bundlePanel);
+		loadFrame.build(dirPanel, bundlePanel);
+		dirPanel.update();
 		loadFrame.showDialog();
+
+		workingDir = dirPanel.getWorkingDir();
+		Logger.INSTANCE.log("[CONFIG] Selected working dir: " + workingDir);
+		dirPanel.storeDirs();
 
 		requester = new ParametersRequester(this);
 		bundlePanel.showFrame();
