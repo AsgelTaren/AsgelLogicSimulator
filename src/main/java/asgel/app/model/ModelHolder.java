@@ -112,7 +112,7 @@ public class ModelHolder extends JPanel
 				delta--;
 				render();
 			}
-			now = last;
+			last = now;
 		}
 	}
 
