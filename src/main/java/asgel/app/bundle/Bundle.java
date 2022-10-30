@@ -72,6 +72,10 @@ public class Bundle {
 		return icon;
 	}
 
+	public File getFile() {
+		return file;
+	}
+
 	@Override
 	public String toString() {
 		return name;

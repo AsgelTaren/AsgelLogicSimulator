@@ -60,7 +60,7 @@ public class App implements IApp {
 
 	// Parameters requester
 	private ParametersRequester requester;
-	
+
 	// Working dir
 	private File workingDir = new File("./res/");
 
@@ -69,7 +69,9 @@ public class App implements IApp {
 	}
 
 	public void start() {
+		Logger.INSTANCE.setVisible(true);
 		registry = new GlobalRegistry();
+		Logger.INSTANCE.log("Created Global Registry");
 
 		BundleLoadingPanel bundlePanel = new BundleLoadingPanel();
 		LoadingFrame loadFrame = new LoadingFrame(bundlePanel);
@@ -184,8 +186,9 @@ public class App implements IApp {
 			Bundle bundle = bundleHolder.b;
 			bundles.add(bundle);
 			try {
+				Logger.INSTANCE.log("[BUNDLES] Detected bundle from " + bundle.getFile());
 				bundle.loadDetails();
-				System.out.println("[BUNDLES] Loaded details for " + bundle.getID() + " : " + bundle.getName());
+				Logger.INSTANCE.log("[BUNDLES] Loaded details for " + bundle.getID() + " : " + bundle.getName());
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -193,16 +196,16 @@ public class App implements IApp {
 			registry.getRegistries().put(bundle.getID(), reg);
 			try {
 				bundle.load(reg, req, registry);
-				System.out.println("[BUNDLES] Loaded " + bundle.getID());
+				Logger.INSTANCE.log("[BUNDLES] Loaded " + bundle.getID());
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
 
-		System.out.println("[REGISTRY] List of all registered object entires");
+		Logger.INSTANCE.log("[REGISTRY] List of all registered object entires");
 		for (BundleRegistry regis : registry.getRegistries().values()) {
 			for (ObjectEntry entry : regis.OBJECT_REGISTRY.values()) {
-				System.out.println("[REGISTRY] -->" + entry.getFullID() + " : " + entry.getName());
+				Logger.INSTANCE.log("[REGISTRY] -->" + entry.getFullID() + " : " + entry.getName());
 			}
 		}
 	}
@@ -244,7 +247,7 @@ public class App implements IApp {
 	public JTabbedPane getHolderTabs() {
 		return holderTabs;
 	}
-	
+
 	public File getWorkingDir() {
 		return workingDir;
 	}

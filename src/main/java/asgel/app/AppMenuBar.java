@@ -31,6 +31,7 @@ public class AppMenuBar extends JMenuBar {
 	public void init() {
 		add(createFileMenu());
 		add(createBundleMenu());
+		add(createHelpMenu());
 	}
 
 	private JMenu createFileMenu() {
@@ -129,7 +130,16 @@ public class AppMenuBar extends JMenuBar {
 		saveAs.setEnabled(app.getSelectedModelHolder() != null);
 		save.setEnabled(app.getSelectedModelHolder() != null && app.getSelectedModelHolder().getFile() != null);
 		close.setEnabled(app.getSelectedModelHolder() != null);
+	}
 
+	private JMenu createHelpMenu() {
+		JMenu res = new JMenu("Help");
+
+		JMenuItem showLogs = new JMenuItem("Show Logs");
+		showLogs.addActionListener(e -> Logger.INSTANCE.setVisible(true));
+		res.add(showLogs);
+
+		return res;
 	}
 
 }
