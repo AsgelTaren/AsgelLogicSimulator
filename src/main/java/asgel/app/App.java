@@ -60,6 +60,9 @@ public class App implements IApp {
 
 	// Parameters requester
 	private ParametersRequester requester;
+	
+	// Working dir
+	private File workingDir = new File("./res/");
 
 	public App() {
 
@@ -240,6 +243,10 @@ public class App implements IApp {
 
 	public JTabbedPane getHolderTabs() {
 		return holderTabs;
+	}
+	
+	public File getWorkingDir() {
+		return workingDir;
 	}
 
 }

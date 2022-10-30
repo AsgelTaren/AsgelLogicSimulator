@@ -140,4 +140,14 @@ public class ParametersRequester implements IParametersRequester {
 		return null;
 	}
 
+	@Override
+	public File getWorkingDir() {
+		return app.getWorkingDir();
+	}
+
+	@Override
+	public JFrame getJFrame() {
+		return app.getJFrame();
+	}
+
 }
