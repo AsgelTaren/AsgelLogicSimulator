@@ -163,6 +163,7 @@ public class AppMenuBar extends JMenuBar {
 
 		JMenuItem showLogs = new JMenuItem("Show Logs");
 		showLogs.addActionListener(e -> Logger.INSTANCE.setVisible(true));
+		setIcon(showLogs, "assets/logs.png");
 		res.add(showLogs);
 
 		return res;
