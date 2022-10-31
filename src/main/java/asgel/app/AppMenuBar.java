@@ -21,7 +21,7 @@ public class AppMenuBar extends JMenuBar {
 
 	private App app;
 
-	private JMenuItem saveAs, save, close;
+	private JMenuItem saveAs, save, close, exportAsBox;
 
 	public AppMenuBar(App app) {
 		super();
@@ -30,6 +30,7 @@ public class AppMenuBar extends JMenuBar {
 
 	public void init() {
 		add(createFileMenu());
+		add(createModelMenu());
 		add(createBundleMenu());
 		add(createHelpMenu());
 	}
@@ -105,6 +106,20 @@ public class AppMenuBar extends JMenuBar {
 		return res;
 	}
 
+	private JMenu createModelMenu() {
+		JMenu res = new JMenu("Model");
+
+		exportAsBox = new JMenuItem("Export as Model Box");
+		exportAsBox.addActionListener(e -> {
+			ExportAsModelBoxDialog dialog = new ExportAsModelBoxDialog(app.getJFrame(), app,
+					app.getSelectedModelHolder());
+			dialog.setVisible(true);
+		});
+		res.add(exportAsBox);
+
+		return res;
+	}
+
 	private JMenu createBundleMenu() {
 		JMenu res = new JMenu("Bundles");
 
@@ -132,6 +147,7 @@ public class AppMenuBar extends JMenuBar {
 		saveAs.setEnabled(app.getSelectedModelHolder() != null);
 		save.setEnabled(app.getSelectedModelHolder() != null && app.getSelectedModelHolder().getFile() != null);
 		close.setEnabled(app.getSelectedModelHolder() != null);
+		exportAsBox.setEnabled(app.getSelectedModelHolder() != null && app.getSelectedModelHolder().getFile() != null);
 	}
 
 	private JMenu createHelpMenu() {
