@@ -55,12 +55,14 @@ public class AppMenuBar extends JMenuBar {
 				}
 			}
 		});
+		setIcon(load, "assets/open.png");
 		res.add(load);
 
 		JMenuItem create = new JMenuItem("New Model");
 		create.addActionListener(e -> {
 			app.setModel(new Model(), null);
 		});
+		setIcon(create, "assets/new.png");
 		res.add(create);
 
 		saveAs = new JMenuItem("Save As");
@@ -83,6 +85,7 @@ public class AppMenuBar extends JMenuBar {
 				app.getSelectedModelHolder().setFile(chooser.getSelectedFile());
 			}
 		});
+		setIcon(saveAs, "assets/save.png");
 		res.add(saveAs);
 
 		save = new JMenuItem("Save");
@@ -92,6 +95,7 @@ public class AppMenuBar extends JMenuBar {
 				Utils.write(holder.getFile(), holder.getModel().convertToJson().toString());
 			}
 		});
+		setIcon(save, "assets/save.png");
 		res.add(save);
 
 		close = new JMenuItem("Close Model");
@@ -101,6 +105,7 @@ public class AppMenuBar extends JMenuBar {
 			app.getJFrame().revalidate();
 			app.getJFrame().repaint();
 		});
+		setIcon(close, "assets/close.png");
 		res.add(close);
 
 		return res;
@@ -115,6 +120,7 @@ public class AppMenuBar extends JMenuBar {
 					app.getSelectedModelHolder());
 			dialog.setVisible(true);
 		});
+		setIcon(exportAsBox, "assets/export.png");
 		res.add(exportAsBox);
 
 		return res;
@@ -127,6 +133,7 @@ public class AppMenuBar extends JMenuBar {
 		show.addActionListener(e -> {
 			new BundleDialog(app.getJFrame(), app).showDialog();
 		});
+		setIcon(show, "assets/bundle.png");
 		res.add(show);
 
 		JMenuItem openFolder = new JMenuItem("Open Bundle folder");
@@ -138,6 +145,7 @@ public class AppMenuBar extends JMenuBar {
 			}
 
 		});
+		setIcon(openFolder, "assets/open.png");
 		res.add(openFolder);
 
 		return res;
@@ -158,6 +166,10 @@ public class AppMenuBar extends JMenuBar {
 		res.add(showLogs);
 
 		return res;
+	}
+
+	private void setIcon(JMenuItem item, String loc) {
+		item.setIcon(asgel.core.bundle.Utils.loadIcon(AppMenuBar.class.getClassLoader().getResourceAsStream(loc), 16));
 	}
 
 }
