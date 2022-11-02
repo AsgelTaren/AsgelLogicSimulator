@@ -24,7 +24,6 @@ import asgel.app.bundle.BundleLoadingPanel;
 import asgel.app.model.ModelHolder;
 import asgel.app.model.OBJTreeRenderer;
 import asgel.app.model.OBJTreeTransferHandler;
-import asgel.core.app.IApp;
 import asgel.core.model.BundleRegistry;
 import asgel.core.model.BundleRegistry.ObjectEntry;
 import asgel.core.model.GlobalRegistry;
@@ -32,7 +31,7 @@ import asgel.core.model.IParametersRequester;
 import asgel.core.model.Model;
 import asgel.core.model.ModelTab;
 
-public class App implements IApp {
+public class App {
 
 	// GFX
 	private JFrame frame;

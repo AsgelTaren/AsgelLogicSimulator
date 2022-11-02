@@ -1,5 +1,6 @@
 plugins {
     id 'application'
+    id 'java-library'
 }
 
 repositories {
@@ -8,21 +9,32 @@ repositories {
 
 dependencies {
     testImplementation 'junit:junit:4.13.2'
-    implementation project(":AsgelLogicCore")
-    implementation 'com.formdev:flatlaf:2.5'
+    api 'com.google.code.gson:gson:2.9.1'
 }
 
 application {
     mainClass = 'asgel.app.Main'
 }
-
-task jarBundles (type : Jar){
-	dependsOn ":AsgelLogicDefault:jar"
-	dependsOn ":AsgelLogicSignalManip:jar"
-	dependsOn ":AsgelCMOS4000:jar"
-}
-run.dependsOn jarBundles
 run.doFirst {
 environment "ASGEL_CONFIG_FILE","./res/appdataFolder/config.json"
 environment "ASGEL_BUNDLE_DIR","./res/appdataFolder/bundles"
 }
+
+task uberJar(type: Jar) {
+archiveClassifier = 'uber'
+
+from sourceSets.main.output
+
+dependsOn configurations.runtimeClasspath
+	from {
+    	configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { zipTree(it) }
+	}
+	manifest {
+	attributes["Main-Class"] = 'asgel.app.Main'
+	}
+}
+configure(uberJar){
+	group "Fat Jar"
+	description "Creating the fat jar"
+}
+
