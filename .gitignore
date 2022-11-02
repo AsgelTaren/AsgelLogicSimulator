@@ -15,5 +15,5 @@ src/test/
 .project
 .settings
 
-# Res folder
-res
+# working Dir
+res/workingDir
