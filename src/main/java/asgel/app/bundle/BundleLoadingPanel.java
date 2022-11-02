@@ -18,15 +18,19 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.AbstractTableModel;
 
+import asgel.app.LaunchConfig;
+
 @SuppressWarnings("serial")
 public class BundleLoadingPanel extends JPanel {
 
 	private ArrayList<BundleHolder> bundles;
 
-	private File dir = new File(System.getenv("APPDATA") + "/AsgelLogicSim/bundles/");
+	private File dir;
 
-	public BundleLoadingPanel() {
+	public BundleLoadingPanel(LaunchConfig config) {
 		super();
+
+		dir = config.getBundleDir();
 
 		setLayout(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -77,7 +81,7 @@ public class BundleLoadingPanel extends JPanel {
 			int choice = chooser.showDialog(this, "Select");
 			if (choice == JFileChooser.APPROVE_OPTION) {
 				dir = chooser.getSelectedFile();
-				load();
+				load(dir);
 				dirField.setText(dir.getAbsolutePath());
 			}
 		});
@@ -94,18 +98,14 @@ public class BundleLoadingPanel extends JPanel {
 		gbc.gridy = 3;
 		gbc.gridwidth = 1;
 
-		load();
+		load(dir);
 	}
 
 	public ArrayList<BundleHolder> getBundles() {
 		return bundles;
 	}
 
-	public void showFrame() {
-		setVisible(true);
-	}
-
-	private void load() {
+	private void load(File dir) {
 		bundles = new ArrayList<BundleHolder>();
 		for (File f : dir.listFiles()) {
 			if (f.getName().endsWith(".jar")) {

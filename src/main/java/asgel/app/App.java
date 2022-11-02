@@ -68,14 +68,14 @@ public class App implements IApp {
 
 	}
 
-	public void start() {
+	public void start(LaunchConfig config) {
 		Logger.INSTANCE.setVisible(true);
 		registry = new GlobalRegistry();
 		Logger.INSTANCE.log("Created Global Registry");
 
 		LoadingFrame loadFrame = new LoadingFrame();
-		WorkingDirPanel dirPanel = new WorkingDirPanel(loadFrame);
-		BundleLoadingPanel bundlePanel = new BundleLoadingPanel();
+		WorkingDirPanel dirPanel = new WorkingDirPanel(loadFrame, config);
+		BundleLoadingPanel bundlePanel = new BundleLoadingPanel(config);
 		loadFrame.build(dirPanel, bundlePanel);
 		dirPanel.update();
 		loadFrame.showDialog();
@@ -85,7 +85,6 @@ public class App implements IApp {
 		dirPanel.storeDirs();
 
 		requester = new ParametersRequester(this);
-		bundlePanel.showFrame();
 		loadBundles(bundlePanel.getBundles(), requester);
 
 		frame = new JFrame("AsgelLogicSimulator origins");

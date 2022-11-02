@@ -1,8 +1,10 @@
 package asgel.app.model;
 
+import java.awt.Color;
 import java.util.ArrayList;
 
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JColorChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -62,7 +64,7 @@ public class PopupUtils {
 		return menu;
 	}
 
-	public static final JPopupMenu forPin(ModelHolder holder, Pin p) {
+	public static final JPopupMenu forPin(ModelHolder holder, Pin p, App app) {
 		JPopupMenu menu = new JPopupMenu();
 
 		JMenuItem remove = new JMenuItem("Remove Link");
@@ -89,6 +91,21 @@ public class PopupUtils {
 			p.getLink().setPath(null);
 		});
 		menu.add(removeLinkPath);
+
+		JMenuItem setColor = new JMenuItem("Set Link Color");
+		setColor.setEnabled(p.getLink() != null);
+		setColor.addActionListener(e -> {
+			Color res = JColorChooser.showDialog(app.getJFrame(), "Select color", p.getLink().getColor());
+			if (res != null) {
+				p.getLink().setColor(res);
+			}
+		});
+		menu.add(setColor);
+
+		JMenuItem clearColor = new JMenuItem("Clear Link Color");
+		clearColor.setEnabled(p.getLink() != null);
+		clearColor.addActionListener(e -> p.getLink().setColor(null));
+		menu.add(clearColor);
 
 		return menu;
 	}

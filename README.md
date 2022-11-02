@@ -1,1 +1,1 @@
-This is the main project of Asgel's logic simulation, and contains the code for the actual executable.
+This is the main project of Asgel's logic simulator, and contains the code for the actual executable.

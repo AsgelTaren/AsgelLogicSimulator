@@ -266,7 +266,7 @@ public class ModelHolder extends JPanel
 			if (highOBJ != null) {
 				PopupUtils.forModelOBJ(this, highOBJ, app).show(e.getComponent(), e.getX(), e.getY());
 			} else if (highPin != null) {
-				PopupUtils.forPin(this, highPin).show(e.getComponent(), e.getX(), e.getY());
+				PopupUtils.forPin(this, highPin, app).show(e.getComponent(), e.getX(), e.getY());
 			}
 		} else if (SwingUtilities.isMiddleMouseButton(e)) {
 			if (highPin != null && highPin.getLink() != null && !highPin.getModelOBJ().isMoveable()
@@ -294,6 +294,7 @@ public class ModelHolder extends JPanel
 		}
 		anchor = null;
 		delta = null;
+		old = null;
 	}
 
 	@Override
@@ -321,7 +322,7 @@ public class ModelHolder extends JPanel
 				if (highPin == anchor) {
 					highPin = null;
 				}
-			} else {
+			} else if (old != null) {
 				Point n = new Point(e.getX(), e.getY());
 				Point temp = old.sub(n);
 				camx += temp.x;

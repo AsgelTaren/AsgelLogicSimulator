@@ -22,3 +22,7 @@ task jarBundles (type : Jar){
 	dependsOn ":AsgelCMOS4000:jar"
 }
 run.dependsOn jarBundles
+run.doFirst {
+environment "ASGEL_CONFIG_FILE","./res/appdataFolder/config.json"
+environment "ASGEL_BUNDLE_DIR","./res/appdataFolder/bundles"
+}

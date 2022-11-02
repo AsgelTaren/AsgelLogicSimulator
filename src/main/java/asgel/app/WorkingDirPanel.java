@@ -24,7 +24,7 @@ public class WorkingDirPanel extends JPanel {
 	private JComboBox<File> combo;
 	private LoadingFrame frame;
 
-	public WorkingDirPanel(LoadingFrame frame) {
+	public WorkingDirPanel(LoadingFrame frame, LaunchConfig config) {
 		super();
 		// Layout
 		setLayout(new GridBagLayout());
@@ -48,7 +48,7 @@ public class WorkingDirPanel extends JPanel {
 
 		// Loading
 		try {
-			File f = new File(System.getenv("APPDATA") + "/AsgelLogicSim/config.json");
+			File f = config.getConfigFile();
 			if (!f.exists())
 				throw new Exception("[CONFIG] No config file found");
 			JsonObject json = JsonParser.parseReader(new FileReader(f)).getAsJsonObject();
