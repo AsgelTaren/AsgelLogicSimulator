@@ -89,10 +89,10 @@ public class WorkingDirPanel extends JPanel {
 		frame.getLaunchButton().setEnabled(combo.getSelectedIndex() != -1);
 	}
 
-	public void storeDirs() {
+	public void storeDirs(LaunchConfig config) {
 		Logger.INSTANCE.log("[CONFIG] Trying to write to config file");
 		try {
-			File f = new File(System.getenv("APPDATA") + "/AsgelLogicSim/config.json");
+			File f = config.getConfigFile();
 			if (!f.exists()) {
 				Logger.INSTANCE.log("[CONFIG] No config file where found, trying to create one...");
 				f.getParentFile().mkdirs();

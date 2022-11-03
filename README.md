@@ -63,7 +63,7 @@ After that, you need to perform a middle-button click on one of the pin, and cli
 
 ## Download
 
-You can download an executable and some common bundles that i used with this <a href="https://www.mediafire.com/file/j1dnevohtpiu8e0/AsgelLogicSimulator-v0.0.rar/file">link</a>
+You can download an executable and some common bundles that i used with this <a href="https://www.mediafire.com/file/zyjl24q63pt83xe/AsgelLogicSimulator-v0.0.rar/file">link</a>
 
 ## Common bundles
 Here is the list of the bundles that i used to simulate the computer

@@ -89,7 +89,7 @@ public class App {
 
 		workingDir = dirPanel.getWorkingDir();
 		Logger.INSTANCE.log("[CONFIG] Selected working dir: " + workingDir);
-		dirPanel.storeDirs();
+		dirPanel.storeDirs(config);
 
 		requester = new ParametersRequester(this);
 		loadBundles(bundlePanel.getBundles(), requester);
