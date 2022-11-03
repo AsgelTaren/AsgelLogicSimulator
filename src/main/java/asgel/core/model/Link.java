@@ -9,6 +9,10 @@ import com.google.gson.JsonElement;
 import asgel.core.gfx.Point;
 import asgel.core.gfx.Renderer;
 
+/**
+ * @author Florent Guille
+ **/
+
 public class Link {
 
 	private Pin start, end;

@@ -2,6 +2,10 @@ package asgel.app;
 
 import java.io.File;
 
+/**
+ * @author Florent Guille
+ **/
+
 public class LaunchConfig {
 
 	// Hold the configuration file, where working directories can be saved

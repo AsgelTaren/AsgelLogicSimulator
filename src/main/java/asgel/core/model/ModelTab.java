@@ -4,6 +4,10 @@ import java.awt.Color;
 
 import javax.swing.ImageIcon;
 
+/**
+ * @author Florent Guille
+ **/
+
 public class ModelTab {
 
 	private String name, id;

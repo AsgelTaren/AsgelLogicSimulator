@@ -18,6 +18,10 @@ import javax.swing.JTextField;
 
 import asgel.core.model.IParametersRequester;
 
+/**
+ * @author Florent Guille
+ **/
+
 public class ParametersRequester implements IParametersRequester {
 
 	private App app;

@@ -8,6 +8,10 @@ import asgel.core.gfx.Direction;
 import asgel.core.gfx.Point;
 import asgel.core.gfx.Renderer;
 
+/**
+ * @author Florent Guille
+ **/
+
 public class Pin {
 
 	// Data stored in the pin

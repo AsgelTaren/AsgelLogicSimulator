@@ -2,6 +2,10 @@ package asgel.core.model;
 
 import java.util.HashMap;
 
+/**
+ * @author Florent Guille
+ **/
+
 public class GlobalRegistry {
 
 	private HashMap<String, BundleRegistry> registries;

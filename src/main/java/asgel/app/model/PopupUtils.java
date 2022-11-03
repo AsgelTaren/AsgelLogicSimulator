@@ -14,6 +14,10 @@ import asgel.core.model.Link;
 import asgel.core.model.ModelOBJ;
 import asgel.core.model.Pin;
 
+/**
+ * @author Florent Guille
+ **/
+
 public class PopupUtils {
 
 	public static final JPopupMenu forModelOBJ(ModelHolder holder, ModelOBJ obj, App app) {

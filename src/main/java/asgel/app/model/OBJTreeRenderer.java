@@ -13,6 +13,10 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import asgel.core.model.BundleRegistry.ObjectEntry;
 import asgel.core.model.ModelTab;
 
+/**
+ * @author Florent Guille
+ **/
+
 @SuppressWarnings("serial")
 public class OBJTreeRenderer extends DefaultTreeCellRenderer {
 

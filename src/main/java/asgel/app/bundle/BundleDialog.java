@@ -23,6 +23,10 @@ import asgel.core.model.BundleRegistry;
 import asgel.core.model.BundleRegistry.ObjectEntry;
 import asgel.core.model.ModelTab;
 
+/**
+ * @author Florent Guille
+ **/
+
 @SuppressWarnings("serial")
 public class BundleDialog extends JDialog {
 

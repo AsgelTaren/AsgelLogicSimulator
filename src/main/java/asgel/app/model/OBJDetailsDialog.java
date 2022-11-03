@@ -21,6 +21,10 @@ import javax.swing.text.NumberFormatter;
 import asgel.core.gfx.Direction;
 import asgel.core.model.ModelOBJ;
 
+/**
+ * @author Florent Guille
+ **/
+
 @SuppressWarnings("serial")
 public class OBJDetailsDialog extends JDialog {
 

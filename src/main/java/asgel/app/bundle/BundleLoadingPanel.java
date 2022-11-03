@@ -20,6 +20,10 @@ import javax.swing.table.AbstractTableModel;
 
 import asgel.app.LaunchConfig;
 
+/**
+ * @author Florent Guille
+ **/
+
 @SuppressWarnings("serial")
 public class BundleLoadingPanel extends JPanel {
 

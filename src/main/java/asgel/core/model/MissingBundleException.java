@@ -1,5 +1,9 @@
 package asgel.core.model;
 
+/**
+ * @author Florent Guille
+ **/
+
 @SuppressWarnings("serial")
 public class MissingBundleException extends Exception {
 

@@ -4,6 +4,10 @@ import javax.swing.table.AbstractTableModel;
 
 import asgel.app.App;
 
+/**
+ * @author Florent Guille
+ **/
+
 @SuppressWarnings("serial")
 public class BundleTableModel extends AbstractTableModel {
 

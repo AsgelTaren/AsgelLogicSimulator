@@ -2,6 +2,7 @@ package asgel.app;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,6 +32,9 @@ import asgel.core.model.IParametersRequester;
 import asgel.core.model.Model;
 import asgel.core.model.ModelTab;
 
+/**
+ * @author Florent Guille
+ **/
 public class App {
 
 	// GFX
@@ -63,6 +67,10 @@ public class App {
 	// Working dir
 	private File workingDir;
 
+	// Icon
+	public static final BufferedImage ICON = Utils
+			.loadImage(App.class.getClassLoader().getResourceAsStream("logo.png"));
+
 	public App() {
 
 	}
@@ -89,6 +97,7 @@ public class App {
 		frame = new JFrame("AsgelLogicSimulator origins");
 		frame.setVisible(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setIconImage(ICON);
 
 		// Right-side panel
 		JPanel right = new JPanel();

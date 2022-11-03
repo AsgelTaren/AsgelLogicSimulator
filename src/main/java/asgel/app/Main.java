@@ -2,6 +2,10 @@ package asgel.app;
 
 import javax.swing.UIManager;
 
+/**
+ * @author Florent Guille
+ **/
+
 public class Main {
 
 	public static void main(String[] args) throws Exception {

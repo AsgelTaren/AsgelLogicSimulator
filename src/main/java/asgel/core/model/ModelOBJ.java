@@ -17,6 +17,10 @@ import asgel.core.gfx.Point;
 import asgel.core.gfx.Renderer;
 import asgel.core.model.BundleRegistry.ObjectEntry;
 
+/**
+ * @author Florent Guille
+ **/
+
 public abstract class ModelOBJ {
 
 	// Pos and dim

@@ -11,6 +11,10 @@ import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.util.Stack;
 
+/**
+ * @author Florent Guille
+ **/
+
 @SuppressWarnings("serial")
 public class Renderer extends Canvas {
 

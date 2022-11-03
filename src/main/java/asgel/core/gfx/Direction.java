@@ -1,5 +1,9 @@
 package asgel.core.gfx;
 
+/**
+ * @author Florent Guille
+ **/
+
 public enum Direction {
 
 	EAST, SOUTH, WEST, NORTH;

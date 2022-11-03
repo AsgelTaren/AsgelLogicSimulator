@@ -10,6 +10,10 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
+/**
+ * @author Florent Guille
+ **/
+
 public class Logger {
 
 	public static final Logger INSTANCE = new Logger();
@@ -19,6 +23,7 @@ public class Logger {
 
 	private Logger() {
 		frame = new JFrame("LOGS");
+		frame.setIconImage(App.ICON);
 
 		JPanel panel = new JPanel();
 		panel.setBorder(BorderFactory.createTitledBorder("LOGS"));

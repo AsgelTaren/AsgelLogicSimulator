@@ -9,6 +9,10 @@ import com.google.gson.JsonObject;
 import asgel.core.gfx.Direction;
 import asgel.core.gfx.Point;
 
+/**
+ * @author Florent Guille
+ **/
+
 public class BundleRegistry {
 
 	// Objects registry

@@ -3,6 +3,7 @@ package asgel.core.bundle;
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
 
+import asgel.app.Utils;
 import asgel.core.model.GlobalRegistry;
 
 public class RessourceManager {

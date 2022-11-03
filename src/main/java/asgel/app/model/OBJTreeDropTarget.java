@@ -8,6 +8,10 @@ import java.awt.dnd.DropTargetListener;
 
 import asgel.core.model.BundleRegistry.ObjectEntry;
 
+/**
+ * @author Florent Guille
+ **/
+
 public class OBJTreeDropTarget implements DropTargetListener {
 
 	private ModelHolder holder;

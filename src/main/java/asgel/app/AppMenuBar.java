@@ -16,6 +16,10 @@ import asgel.app.bundle.BundleDialog;
 import asgel.app.model.ModelHolder;
 import asgel.core.model.Model;
 
+/**
+ * @author Florent Guille
+ **/
+
 @SuppressWarnings("serial")
 public class AppMenuBar extends JMenuBar {
 
@@ -170,7 +174,7 @@ public class AppMenuBar extends JMenuBar {
 	}
 
 	private void setIcon(JMenuItem item, String loc) {
-		item.setIcon(asgel.core.bundle.Utils.loadIcon(AppMenuBar.class.getClassLoader().getResourceAsStream(loc), 16));
+		item.setIcon(Utils.loadIcon(AppMenuBar.class.getClassLoader().getResourceAsStream(loc), 16));
 	}
 
 }

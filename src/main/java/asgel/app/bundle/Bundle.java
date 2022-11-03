@@ -16,6 +16,10 @@ import asgel.core.model.BundleRegistry;
 import asgel.core.model.GlobalRegistry;
 import asgel.core.model.IParametersRequester;
 
+/**
+ * @author Florent Guille
+ **/
+
 public class Bundle {
 
 	private File file;
@@ -40,7 +44,7 @@ public class Bundle {
 		this.main = obj.get("main").getAsString();
 
 		try {
-			icon = asgel.core.bundle.Utils.loadIcon(Utils.openStreamInJar(file, "logo.png"), 16);
+			icon = Utils.loadIcon(Utils.openStreamInJar(file, "logo.png"), 16);
 		} catch (Exception e) {
 			System.out.println("Failed to load logo.png for" + id);
 		}

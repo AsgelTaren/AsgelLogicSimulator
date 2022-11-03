@@ -7,6 +7,10 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 
+/**
+ * @author Florent Guille
+ **/
+
 public class BundleCellRenderer implements TableCellRenderer {
 
 	private DefaultTableCellRenderer def;

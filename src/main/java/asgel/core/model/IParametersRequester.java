@@ -4,6 +4,10 @@ import java.io.File;
 
 import javax.swing.JFrame;
 
+/**
+ * @author Florent Guille
+ **/
+
 public interface IParametersRequester {
 
 	public String[] getParameters(String... args);

@@ -28,6 +28,10 @@ import asgel.core.model.Model;
 import asgel.core.model.ModelOBJ;
 import asgel.core.model.Pin;
 
+/**
+ * @author Florent Guille
+ **/
+
 @SuppressWarnings("serial")
 public class ModelHolder extends JPanel
 		implements MouseMotionListener, MouseListener, MouseWheelListener, KeyListener, Runnable {

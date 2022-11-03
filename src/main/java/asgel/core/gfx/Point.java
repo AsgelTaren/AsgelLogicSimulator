@@ -4,6 +4,10 @@ import java.util.function.Function;
 
 import com.google.gson.JsonObject;
 
+/**
+ * @author Florent Guille
+ **/
+
 public class Point {
 
 	public float x, y;

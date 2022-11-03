@@ -12,6 +12,10 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import asgel.app.App;
 import asgel.core.model.BundleRegistry.ObjectEntry;
 
+/**
+ * @author Florent Guille
+ **/
+
 @SuppressWarnings("serial")
 public class OBJTreeTransferHandler extends TransferHandler {
 

@@ -10,6 +10,10 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
+/**
+ * @author Florent Guille
+ **/
+
 @SuppressWarnings("serial")
 public class LoadingFrame extends JDialog {
 
@@ -19,7 +23,7 @@ public class LoadingFrame extends JDialog {
 
 	public LoadingFrame() {
 		super((Frame) null, "Loading", true);
-
+		setIconImage(App.ICON);
 	}
 
 	public void build(JPanel... panels) {

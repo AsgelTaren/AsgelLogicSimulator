@@ -15,6 +15,10 @@ import com.google.gson.JsonParser;
 import asgel.core.gfx.Point;
 import asgel.core.model.BundleRegistry.ObjectEntry;
 
+/**
+ * @author Florent Guille
+ **/
+
 public class Model {
 
 	private ArrayList<ModelOBJ> objects;

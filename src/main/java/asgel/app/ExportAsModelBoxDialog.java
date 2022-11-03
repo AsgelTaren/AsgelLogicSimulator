@@ -20,6 +20,10 @@ import com.google.gson.JsonObject;
 
 import asgel.app.model.ModelHolder;
 
+/**
+ * @author Florent Guille
+ **/
+
 @SuppressWarnings("serial")
 public class ExportAsModelBoxDialog extends JDialog {
 
