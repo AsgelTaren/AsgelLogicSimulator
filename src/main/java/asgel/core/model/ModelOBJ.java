@@ -119,9 +119,7 @@ public abstract class ModelOBJ {
 			}
 		} else {
 			renderer.fillRoundedRect(0, 0, width, height, 20, Color.GRAY);
-			if (highOBJ == this) {
-				renderer.drawRoundedRect(0, 0, width, height, 20, Color.GREEN);
-			}
+			renderer.drawRoundedRect(0, 0, width, height, 20, highOBJ == this ? Color.GREEN : Color.BLACK);
 			renderer.drawCenteredString(symbol, width >> 1, height >> 1, Color.BLACK);
 
 		}

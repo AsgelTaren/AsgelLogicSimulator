@@ -60,11 +60,12 @@ public class BundleDialog extends JDialog {
 		add(tabPanel, gbc);
 
 		JPanel contPanel = new JPanel();
+		contPanel.setBorder(BorderFactory.createTitledBorder("Bundle Content"));
 
 		contTree = new JTree(new DefaultMutableTreeNode("No bundle"));
-		contTree.setPreferredSize(new Dimension(600, 400));
-		contTree.setMaximumSize(new Dimension(600, 400));
-		contTree.setMinimumSize(new Dimension(600, 400));
+		contTree.setPreferredSize(new Dimension(600, 300));
+		contTree.setMaximumSize(new Dimension(600, 300));
+		contTree.setMinimumSize(new Dimension(600, 300));
 		contTree.setCellRenderer(new OBJTreeRenderer());
 		ToolTipManager.sharedInstance().registerComponent(contTree);
 		contPanel.add(new JScrollPane(contTree));
@@ -78,7 +79,7 @@ public class BundleDialog extends JDialog {
 		});
 
 		gbc.gridy = 1;
-		add(contTree, gbc);
+		add(contPanel, gbc);
 		pack();
 		setLocationRelativeTo(null);
 

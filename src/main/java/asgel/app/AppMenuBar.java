@@ -87,6 +87,8 @@ public class AppMenuBar extends JMenuBar {
 				Utils.write(chooser.getSelectedFile(),
 						app.getSelectedModelHolder().getModel().convertToJson().toString());
 				app.getSelectedModelHolder().setFile(chooser.getSelectedFile());
+				app.getHolderTabs().setTitleAt(app.getHolderTabs().getSelectedIndex(),
+						chooser.getSelectedFile().getName());
 			}
 		});
 		setIcon(saveAs, "assets/save.png");
@@ -175,6 +177,14 @@ public class AppMenuBar extends JMenuBar {
 
 	private void setIcon(JMenuItem item, String loc) {
 		item.setIcon(Utils.loadIcon(AppMenuBar.class.getClassLoader().getResourceAsStream(loc), 16));
+	}
+
+	public void saveAs() {
+		saveAs.doClick();
+	}
+
+	public void save() {
+		save.doClick();
 	}
 
 }
