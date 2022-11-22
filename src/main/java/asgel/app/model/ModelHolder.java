@@ -406,6 +406,13 @@ public class ModelHolder extends JPanel
 				}
 			}
 		}
+		if (e.getKeyCode() == KeyEvent.VK_S && e.isControlDown()) {
+			if (file == null) {
+				app.getMenuBar().saveAs();
+			} else {
+				app.getMenuBar().save();
+			}
+		}
 
 	}
 

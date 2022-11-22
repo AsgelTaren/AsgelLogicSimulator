@@ -265,5 +265,9 @@ public class App {
 	public File getWorkingDir() {
 		return workingDir;
 	}
+	
+	public AppMenuBar getMenuBar() {
+		return menubar;
+	}
 
 }
