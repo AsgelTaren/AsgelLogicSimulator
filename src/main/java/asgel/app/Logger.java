@@ -16,12 +16,13 @@ import javax.swing.JTextArea;
 
 public class Logger {
 
-	public static final Logger INSTANCE = new Logger();
+	public static final Logger INSTANCE = new Logger("");
 
 	private JFrame frame;
 	private JTextArea area;
+	private String prefix = "";
 
-	private Logger() {
+	private Logger(String prefix) {
 		frame = new JFrame("LOGS");
 		frame.setIconImage(App.ICON);
 
@@ -48,15 +49,24 @@ public class Logger {
 		frame.pack();
 		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		frame.setLocationRelativeTo(null);
+	}
 
+	private Logger(String prefix, JFrame frame, JTextArea area) {
+		this.prefix = prefix;
+		this.frame = frame;
+		this.area = area;
 	}
 
 	public void log(String s) {
-		area.append(s + "\n");
+		area.append(prefix + " " + s + "\n");
 	}
 
 	public void setVisible(boolean vis) {
 		frame.setVisible(vis);
+	}
+
+	public Logger derivateLogger(String prefix) {
+		return new Logger("".equals(this.prefix) ? prefix : this.prefix + " " + prefix, frame, area);
 	}
 
 }

@@ -27,7 +27,7 @@ public class OBJTreeTransferHandler extends TransferHandler {
 
 	@Override
 	protected Transferable createTransferable(JComponent c) {
-		DefaultMutableTreeNode node = (DefaultMutableTreeNode) app.getTree().getLastSelectedPathComponent();
+		DefaultMutableTreeNode node = (DefaultMutableTreeNode) app.getRegistryTree().getLastSelectedPathComponent();
 		if (node.getUserObject() instanceof ObjectEntry entry) {
 			return new ObjectEntryTransferable(entry);
 		}

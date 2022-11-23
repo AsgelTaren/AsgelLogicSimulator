@@ -37,6 +37,9 @@ public abstract class ModelOBJ {
 	// Pins
 	protected Pin[] pins;
 
+	// Category
+	private String category;
+
 	protected ModelOBJ(String name, String symbol, int x, int y, int width, int height, int pins) {
 		this.name = name;
 		this.symbol = symbol;
@@ -207,6 +210,14 @@ public abstract class ModelOBJ {
 
 	public Direction getRotation() {
 		return rot;
+	}
+
+	public String getCategory() {
+		return category;
+	}
+
+	public void setCategory(String category) {
+		this.category = category;
 	}
 
 	public void setRotation(Direction rot) {

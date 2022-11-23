@@ -90,24 +90,24 @@ public class WorkingDirPanel extends JPanel {
 	}
 
 	public void storeDirs(LaunchConfig config) {
-		Logger.INSTANCE.log("[CONFIG] Trying to write to config file");
+		Logger log = Logger.INSTANCE.derivateLogger("[CONFIG]");
 		try {
 			File f = config.getConfigFile();
 			if (!f.exists()) {
-				Logger.INSTANCE.log("[CONFIG] No config file where found, trying to create one...");
+				log.log("No config file where found, trying to create one...");
 				f.getParentFile().mkdirs();
 				f.createNewFile();
 			}
 
 			JsonArray arr = new JsonArray();
 			for (int i = 0; i < combo.getModel().getSize(); i++) {
-				arr.add(combo.getModel().getElementAt(i).getAbsolutePath());
+				arr.add(combo.getModel().getElementAt(i).getPath());
 			}
 			JsonObject res = new JsonObject();
 			res.add("lastdirs", arr);
 			Utils.write(f, res.toString());
 		} catch (Exception e) {
-			Logger.INSTANCE.log("[CONFIG] Unable to create config file: " + e.getMessage());
+			log.log("Unable to create config file: " + e.getMessage());
 		}
 	}
 

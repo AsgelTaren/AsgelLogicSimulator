@@ -5,19 +5,23 @@ import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.ListSelectionModel;
 import javax.swing.ToolTipManager;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
 import asgel.app.bundle.Bundle;
@@ -50,13 +54,16 @@ public class App {
 	// Global Registry
 	private GlobalRegistry registry;
 
-	// Object Tree
-	private JTree tree;
+	// Object registry Tree
+	private JTree registryTree;
 	private JTextField searchBar;
-	private OBJTreeRenderer treeRend;
+	private OBJTreeRenderer registryTreeRend;
 	private DefaultMutableTreeNode root;
 	private HashMap<String, DefaultMutableTreeNode> tabs;
 	private HashMap<String, DefaultMutableTreeNode> entries;
+
+	// Objects Tree
+	private JTree objectsTree;
 
 	// App Menu Bar
 	private AppMenuBar menubar;
@@ -76,9 +83,10 @@ public class App {
 	}
 
 	public void start(LaunchConfig config) {
-		Logger.INSTANCE.setVisible(true);
+		Logger log = Logger.INSTANCE.derivateLogger("[LAUNCH]");
+		log.setVisible(true);
 		registry = new GlobalRegistry();
-		Logger.INSTANCE.log("Created Global Registry");
+		log.log("Created Global Registry");
 
 		LoadingFrame loadFrame = new LoadingFrame();
 		WorkingDirPanel dirPanel = new WorkingDirPanel(loadFrame, config);
@@ -88,7 +96,7 @@ public class App {
 		loadFrame.showDialog();
 
 		workingDir = dirPanel.getWorkingDir();
-		Logger.INSTANCE.log("[CONFIG] Selected working dir: " + workingDir);
+		log.log("Selected working dir: " + workingDir);
 		dirPanel.storeDirs(config);
 
 		requester = new ParametersRequester(this);
@@ -98,6 +106,14 @@ public class App {
 		frame.setVisible(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setIconImage(ICON);
+
+		// Objects Tree
+		objectsTree = new JTree((DefaultMutableTreeNode) null);
+		objectsTree.setPreferredSize(new Dimension(400, 500));
+		objectsTree.setTransferHandler(new ObjectsTreeTransferHandler(this));
+		objectsTree.setDragEnabled(true);
+		objectsTree.addKeyListener(new ObjectsTreeKeyListener(this));
+		JScrollPane objectsScroll = new JScrollPane(objectsTree);
 
 		// Right-side panel
 		JPanel right = new JPanel();
@@ -116,15 +132,15 @@ public class App {
 
 		right.add(searchPanel);
 
-		// Tree
+		// Registry Tree
 		buildTree();
-		tree.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		tree.setDragEnabled(true);
-		tree.setTransferHandler(new OBJTreeTransferHandler(this));
-		ToolTipManager.sharedInstance().registerComponent(tree);
-		tree.setCellRenderer(treeRend = new OBJTreeRenderer());
+		registryTree.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		registryTree.setDragEnabled(true);
+		registryTree.setTransferHandler(new OBJTreeTransferHandler(this));
+		ToolTipManager.sharedInstance().registerComponent(registryTree);
+		registryTree.setCellRenderer(registryTreeRend = new OBJTreeRenderer());
 
-		JScrollPane scroll = new JScrollPane(tree);
+		JScrollPane scroll = new JScrollPane(registryTree);
 		right.add(scroll);
 
 		// Search Bar Listener
@@ -139,14 +155,14 @@ public class App {
 						}
 					}
 				}
-			treeRend.setSearchResult(searchResult);
-			tree.clearSelection();
+			registryTreeRend.setSearchResult(searchResult);
+			registryTree.clearSelection();
 			for (ObjectEntry entry : searchResult) {
-				tree.addSelectionPath(new TreePath(
+				registryTree.addSelectionPath(new TreePath(
 						new Object[] { root, tabs.get(entry.getFullTab()), entries.get(entry.getFullID()) }));
 			}
-			tree.revalidate();
-			tree.repaint();
+			registryTree.revalidate();
+			registryTree.repaint();
 		});
 
 		frame.add(right, BorderLayout.EAST);
@@ -157,25 +173,43 @@ public class App {
 		frame.setJMenuBar(menubar);
 
 		holderTabs = new JTabbedPane();
-		holderTabs.setPreferredSize(new Dimension(1650, 950));
 		holderTabs.addChangeListener(e -> {
 			if (previous != null) {
 				previous.stop();
 			}
 			previous = (ModelHolder) holderTabs.getSelectedComponent();
-			if (previous != null)
+			if (previous != null) {
 				previous.start();
+				((DefaultTreeModel) objectsTree.getModel()).setRoot(previous.getNodeRepresentation());
+			}
 			menubar.updateOnChange();
 		});
-		frame.add(holderTabs, BorderLayout.CENTER);
+
+		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, objectsScroll, holderTabs);
+		splitPane.setDividerLocation(250);
+		frame.add(splitPane, BorderLayout.CENTER);
 
 		frame.pack();
 		frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		menubar.updateOnChange();
 	}
 
-	public JTree getTree() {
-		return tree;
+	public JTree getRegistryTree() {
+		return registryTree;
+	}
+
+	public JTree getObjectsTree() {
+		return objectsTree;
+	}
+
+	public void updateObjectsTree() {
+		Enumeration<TreePath> expanded = objectsTree
+				.getExpandedDescendants(new TreePath(new Object[] { objectsTree.getModel().getRoot() }));
+		((DefaultTreeModel) objectsTree.getModel()).reload();
+		Iterator<TreePath> it = expanded.asIterator();
+		while (it.hasNext()) {
+			objectsTree.expandPath(it.next());
+		}
 	}
 
 	public JFrame getJFrame() {
@@ -192,7 +226,7 @@ public class App {
 
 	private void loadBundles(ArrayList<BundleLoadingPanel.BundleHolder> temp, IParametersRequester req) {
 		bundles = new ArrayList<Bundle>();
-
+		Logger log = Logger.INSTANCE.derivateLogger("[BUNDLES]");
 		for (BundleLoadingPanel.BundleHolder bundleHolder : temp) {
 			if (!bundleHolder.used) {
 				continue;
@@ -200,9 +234,9 @@ public class App {
 			Bundle bundle = bundleHolder.b;
 			bundles.add(bundle);
 			try {
-				Logger.INSTANCE.log("[BUNDLES] Detected bundle from " + bundle.getFile());
+				log.log("Detected bundle from " + bundle.getFile());
 				bundle.loadDetails();
-				Logger.INSTANCE.log("[BUNDLES] Loaded details for " + bundle.getID() + " : " + bundle.getName());
+				log.log("Loaded details for " + bundle.getID() + " : " + bundle.getName());
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -210,16 +244,18 @@ public class App {
 			registry.getRegistries().put(bundle.getID(), reg);
 			try {
 				bundle.load(reg, req, registry);
-				Logger.INSTANCE.log("[BUNDLES] Loaded " + bundle.getID());
+				log.log("Loaded " + bundle.getID());
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
 
-		Logger.INSTANCE.log("[REGISTRY] List of all registered object entires");
+		Logger reg = log.derivateLogger("[REGISTRY]");
+
+		reg.log("List of all registered object entires");
 		for (BundleRegistry regis : registry.getRegistries().values()) {
 			for (ObjectEntry entry : regis.OBJECT_REGISTRY.values()) {
-				Logger.INSTANCE.log("[REGISTRY] -->" + entry.getFullID() + " : " + entry.getName());
+				reg.log(" -->" + entry.getFullID() + " : " + entry.getName());
 			}
 		}
 	}
@@ -244,7 +280,7 @@ public class App {
 				entries.put(entry.getFullID(), node);
 			}
 		}
-		tree = new JTree(root);
+		registryTree = new JTree(root);
 	}
 
 	public ModelHolder getSelectedModelHolder() {
@@ -265,7 +301,7 @@ public class App {
 	public File getWorkingDir() {
 		return workingDir;
 	}
-	
+
 	public AppMenuBar getMenuBar() {
 		return menubar;
 	}

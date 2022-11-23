@@ -14,11 +14,14 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import javax.swing.tree.DefaultMutableTreeNode;
 
 import asgel.app.App;
+import asgel.app.ObjectCategory;
 import asgel.core.gfx.Point;
 import asgel.core.gfx.Renderer;
 import asgel.core.model.BundleRegistry.ObjectEntry;
@@ -78,6 +81,11 @@ public class ModelHolder extends JPanel
 	private String name;
 	private File file;
 
+	// Node representation
+	private DefaultMutableTreeNode root, def, cats;
+	private HashMap<String, DefaultMutableTreeNode> nodes;
+	private HashMap<ModelOBJ, DefaultMutableTreeNode> objNodes;
+
 	public ModelHolder(Model model, App app, String name, File f) {
 		super();
 		this.model = model;
@@ -94,12 +102,18 @@ public class ModelHolder extends JPanel
 		renderer = new Renderer(18);
 		add(renderer, gbc);
 
+		// Adding drop target
 		@SuppressWarnings("unused")
 		DropTarget target = new DropTarget(renderer, new OBJTreeDropTarget(this));
+
+		// Adding listeners
 		renderer.addMouseListener(this);
 		renderer.addMouseMotionListener(this);
 		renderer.addMouseWheelListener(this);
 		renderer.addKeyListener(this);
+
+		// Node representation
+		createNodeRepresentation();
 	}
 
 	@Override
@@ -210,6 +224,8 @@ public class ModelHolder extends JPanel
 		if (obj != null) {
 			objToAdd.add(obj);
 			obj.update();
+			def.add(new DefaultMutableTreeNode(obj));
+			app.updateObjectsTree();
 		}
 	}
 
@@ -381,6 +397,46 @@ public class ModelHolder extends JPanel
 				}
 			}
 		}
+	}
+
+	private void createNodeRepresentation() {
+		root = new DefaultMutableTreeNode(this);
+		def = new DefaultMutableTreeNode("Default");
+		cats = new DefaultMutableTreeNode("Categories");
+		root.add(def);
+		root.add(cats);
+		nodes = new HashMap<>();
+		objNodes = new HashMap<>();
+		rebuildNodeRepresentation();
+	}
+
+	public void rebuildNodeRepresentation() {
+		def.removeAllChildren();
+		cats.removeAllChildren();
+		for (ModelOBJ object : model.getObjects()) {
+			DefaultMutableTreeNode objNode = objNodes.get(object);
+			if (objNode == null) {
+				objNode = new DefaultMutableTreeNode(object);
+				objNodes.put(object, objNode);
+			}
+			if (object.getCategory() == null || "".equals(object.getCategory())) {
+				def.add(objNode);
+			} else {
+				DefaultMutableTreeNode cat = nodes.get(object.getCategory());
+				if (cat == null) {
+					cat = new DefaultMutableTreeNode(new ObjectCategory(object.getCategory()));
+					nodes.put(object.getCategory(), cat);
+				}
+				if (cat.getParent() == null) {
+					cats.add(cat);
+				}
+				cat.add(objNode);
+			}
+		}
+	}
+
+	public DefaultMutableTreeNode getNodeRepresentation() {
+		return root;
 	}
 
 	@Override

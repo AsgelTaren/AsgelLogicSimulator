@@ -9,6 +9,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.tree.DefaultTreeModel;
 
 import com.google.gson.JsonParser;
 
@@ -90,6 +91,7 @@ public class AppMenuBar extends JMenuBar {
 				app.getHolderTabs().setTitleAt(app.getHolderTabs().getSelectedIndex(),
 						chooser.getSelectedFile().getName());
 			}
+			updateOnChange();
 		});
 		setIcon(saveAs, "assets/save.png");
 		res.add(saveAs);
@@ -107,6 +109,9 @@ public class AppMenuBar extends JMenuBar {
 		close = new JMenuItem("Close Model");
 		close.addActionListener(e -> {
 			app.getHolderTabs().remove(app.getSelectedModelHolder());
+			DefaultTreeModel mod = (DefaultTreeModel) app.getObjectsTree().getModel();
+			mod.setRoot(null);
+			mod.reload();
 			app.getHolderTabs().repaint();
 			app.getJFrame().revalidate();
 			app.getJFrame().repaint();
