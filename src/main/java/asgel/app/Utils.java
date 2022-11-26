@@ -28,6 +28,17 @@ public class Utils {
 		return null;
 	}
 
+	public static InputStream openStreamToJar(File jar) {
+		try {
+			URL url = new URL("jar:file:/" + jar.getAbsolutePath());
+			JarURLConnection con = (JarURLConnection) url.openConnection();
+			return con.getInputStream();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
 	public static void write(File f, String data) {
 		try {
 			Files.writeString(f.toPath(), data);

@@ -18,7 +18,16 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.AbstractTableModel;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import asgel.app.App;
 import asgel.app.LaunchConfig;
+import asgel.app.Logger;
+import asgel.app.Utils;
+import asgel.core.bundle.Bundle;
 
 /**
  * @author Florent Guille
@@ -31,7 +40,7 @@ public class BundleLoadingPanel extends JPanel {
 
 	private File dir;
 
-	public BundleLoadingPanel(LaunchConfig config) {
+	public BundleLoadingPanel(LaunchConfig config, Logger log, App app) {
 		super();
 
 		dir = config.getBundleDir();
@@ -85,7 +94,7 @@ public class BundleLoadingPanel extends JPanel {
 			int choice = chooser.showDialog(this, "Select");
 			if (choice == JFileChooser.APPROVE_OPTION) {
 				dir = chooser.getSelectedFile();
-				load(dir);
+				load(dir, log, app);
 				dirField.setText(dir.getAbsolutePath());
 			}
 		});
@@ -102,23 +111,37 @@ public class BundleLoadingPanel extends JPanel {
 		gbc.gridy = 3;
 		gbc.gridwidth = 1;
 
-		load(dir);
+		load(dir, log, app);
 	}
 
 	public ArrayList<BundleHolder> getBundles() {
 		return bundles;
 	}
 
-	private void load(File dir) {
+	private void load(File dir, Logger log, App app) {
 		bundles = new ArrayList<BundleHolder>();
 		for (File f : dir.listFiles()) {
 			if (f.getName().endsWith(".jar")) {
-				Bundle b = new Bundle(f);
 				try {
-					b.loadDetails();
-					bundles.add(new BundleHolder(b, true));
+					JsonArray bundles = JsonParser
+							.parseString(new String(Utils.openStreamInJar(f, "bundles.json").readAllBytes()))
+							.getAsJsonObject().get("bundles").getAsJsonArray();
+					for (JsonElement element : bundles) {
+						JsonObject bundleData = (JsonObject) element;
+						Bundle bundle = Bundle.preLoadBundle(f, bundleData.get("id").getAsString(),
+								bundleData.get("main").getAsString(), app.getGlobalRegistry(),
+								app.getParametersRequester());
+						try {
+							log.log("Detected bundle from " + bundle.getFile());
+							bundle.loadDetails(log);
+							log.log("Loaded details for " + bundle.getID() + " : " + bundle.getName());
+						} catch (Exception e) {
+							log.log("Failed to load data for bundle with id: " + bundle.getID());
+						}
+						this.bundles.add(new BundleHolder(bundle, true));
+					}
 				} catch (Exception e) {
-					System.out.println("Wrong file found at " + f);
+					log.log("Failed to load file " + f);
 				}
 			}
 		}

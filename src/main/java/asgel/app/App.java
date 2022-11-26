@@ -24,11 +24,11 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
-import asgel.app.bundle.Bundle;
 import asgel.app.bundle.BundleLoadingPanel;
 import asgel.app.model.ModelHolder;
 import asgel.app.model.OBJTreeRenderer;
 import asgel.app.model.OBJTreeTransferHandler;
+import asgel.core.bundle.Bundle;
 import asgel.core.model.BundleRegistry;
 import asgel.core.model.BundleRegistry.ObjectEntry;
 import asgel.core.model.GlobalRegistry;
@@ -90,7 +90,7 @@ public class App {
 
 		LoadingFrame loadFrame = new LoadingFrame();
 		WorkingDirPanel dirPanel = new WorkingDirPanel(loadFrame, config);
-		BundleLoadingPanel bundlePanel = new BundleLoadingPanel(config);
+		BundleLoadingPanel bundlePanel = new BundleLoadingPanel(config, log, this);
 		loadFrame.build(dirPanel, bundlePanel);
 		dirPanel.update();
 		loadFrame.showDialog();
@@ -233,17 +233,9 @@ public class App {
 			}
 			Bundle bundle = bundleHolder.b;
 			bundles.add(bundle);
+			registry.getRegistries().put(bundle.getID(), bundle.getBundleRegistry());
 			try {
-				log.log("Detected bundle from " + bundle.getFile());
-				bundle.loadDetails();
-				log.log("Loaded details for " + bundle.getID() + " : " + bundle.getName());
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			BundleRegistry reg = new BundleRegistry(bundle.getID());
-			registry.getRegistries().put(bundle.getID(), reg);
-			try {
-				bundle.load(reg, req, registry);
+				bundle.onLoad();
 				log.log("Loaded " + bundle.getID());
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -304,6 +296,10 @@ public class App {
 
 	public AppMenuBar getMenuBar() {
 		return menubar;
+	}
+
+	public IParametersRequester getParametersRequester() {
+		return requester;
 	}
 
 }

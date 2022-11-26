@@ -19,6 +19,7 @@ import javax.swing.tree.DefaultTreeModel;
 
 import asgel.app.App;
 import asgel.app.model.OBJTreeRenderer;
+import asgel.core.bundle.Bundle;
 import asgel.core.model.BundleRegistry;
 import asgel.core.model.BundleRegistry.ObjectEntry;
 import asgel.core.model.ModelTab;

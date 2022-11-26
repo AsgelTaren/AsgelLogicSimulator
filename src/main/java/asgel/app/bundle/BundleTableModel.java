@@ -3,6 +3,7 @@ package asgel.app.bundle;
 import javax.swing.table.AbstractTableModel;
 
 import asgel.app.App;
+import asgel.core.bundle.Bundle;
 
 /**
  * @author Florent Guille
