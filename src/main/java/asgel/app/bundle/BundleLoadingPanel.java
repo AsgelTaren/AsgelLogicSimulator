@@ -40,8 +40,11 @@ public class BundleLoadingPanel extends JPanel {
 
 	private File dir;
 
+	private App app;
+
 	public BundleLoadingPanel(LaunchConfig config, Logger log, App app) {
 		super();
+		this.app = app;
 
 		dir = config.getBundleDir();
 
@@ -51,7 +54,7 @@ public class BundleLoadingPanel extends JPanel {
 		gbc.gridwidth = 2;
 		gbc.gridheight = 1;
 
-		JTable table = new JTable(new BundleLoadingModel(this));
+		JTable table = new JTable(new BundleLoadingModel(this, app));
 		table.setPreferredScrollableViewportSize(new Dimension(600, 400));
 		table.setDefaultRenderer(Bundle.class, new BundleCellRenderer());
 		table.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -59,7 +62,7 @@ public class BundleLoadingPanel extends JPanel {
 		add(new JScrollPane(table), gbc);
 
 		JTextArea area = new JTextArea();
-		area.setBorder(BorderFactory.createTitledBorder("Bundle Desc"));
+		area.setBorder(BorderFactory.createTitledBorder(app.getText("loading.bundle.desc")));
 		area.setEditable(false);
 		area.setPreferredSize(new Dimension(600, 100));
 		table.getSelectionModel().addListSelectionListener(e -> {
@@ -73,7 +76,7 @@ public class BundleLoadingPanel extends JPanel {
 
 		JPanel loc = new JPanel();
 		loc.setLayout(new GridBagLayout());
-		loc.setBorder(BorderFactory.createTitledBorder("Location"));
+		loc.setBorder(BorderFactory.createTitledBorder(app.getText("loading.bundle.location")));
 
 		gbc.gridx = 0;
 		gbc.gridwidth = 1;
@@ -86,12 +89,12 @@ public class BundleLoadingPanel extends JPanel {
 
 		gbc.gridx = 1;
 		gbc.weightx = 0.2;
-		JButton browse = new JButton("Browse");
+		JButton browse = new JButton(app.getText("loading.bundle.browse"));
 		browse.addActionListener(e -> {
 			JFileChooser chooser = new JFileChooser();
 			chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 			chooser.setCurrentDirectory(dir);
-			int choice = chooser.showDialog(this, "Select");
+			int choice = chooser.showDialog(this, app.getText("loading.bundle.approve"));
 			if (choice == JFileChooser.APPROVE_OPTION) {
 				dir = chooser.getSelectedFile();
 				load(dir, log, app);
@@ -152,10 +155,12 @@ public class BundleLoadingPanel extends JPanel {
 	private class BundleLoadingModel extends AbstractTableModel {
 
 		private BundleLoadingPanel load;
+		private App app;
 
-		private BundleLoadingModel(BundleLoadingPanel load) {
+		private BundleLoadingModel(BundleLoadingPanel load, App app) {
 			super();
 			this.load = load;
+			this.app = app;
 		}
 
 		@Override
@@ -184,13 +189,13 @@ public class BundleLoadingPanel extends JPanel {
 		public String getColumnName(int i) {
 			switch (i) {
 			case 0:
-				return "Used";
+				return app.getText("loading.bundle.used");
 			case 1:
-				return "Bundle";
+				return app.getText("loading.bundle.bundle");
 			case 2:
-				return "ID";
+				return app.getText("loading.bundle.id");
 			case 3:
-				return "Desc";
+				return app.getText("loading.bundle.desc");
 			}
 			return null;
 		}
@@ -237,7 +242,7 @@ public class BundleLoadingPanel extends JPanel {
 
 	@Override
 	public String toString() {
-		return "Bundles";
+		return app.getText("loading.bundle.title");
 	}
 
 }

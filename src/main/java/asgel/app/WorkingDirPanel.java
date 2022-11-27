@@ -4,7 +4,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.io.File;
-import java.io.FileReader;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -16,7 +15,6 @@ import javax.swing.JPanel;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 /**
  * @author Florent Guille
@@ -38,10 +36,10 @@ public class WorkingDirPanel extends JPanel {
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.anchor = GridBagConstraints.NORTH;
 		gbc.insets = new Insets(5, 5, 5, 5);
-		setBorder(BorderFactory.createTitledBorder("Select working dir"));
+		setBorder(BorderFactory.createTitledBorder(frame.getApp().getText("loading.workingdir.select")));
 
 		// Label
-		add(new JLabel("Working Dir"), gbc);
+		add(new JLabel(frame.getApp().getText("loading.workingdir")), gbc);
 
 		// Loading Frame
 		this.frame = frame;
@@ -52,11 +50,7 @@ public class WorkingDirPanel extends JPanel {
 
 		// Loading
 		try {
-			File f = config.getConfigFile();
-			if (!f.exists())
-				throw new Exception("[CONFIG] No config file found");
-			JsonObject json = JsonParser.parseReader(new FileReader(f)).getAsJsonObject();
-			JsonArray arr = json.get("lastdirs").getAsJsonArray();
+			JsonArray arr = config.getConfigJson().get("lastdirs").getAsJsonArray();
 			for (JsonElement e : arr) {
 				combo.addItem(new File(e.getAsString()));
 			}
@@ -71,11 +65,11 @@ public class WorkingDirPanel extends JPanel {
 
 		add(combo, gbc);
 
-		JButton browse = new JButton("Browse");
+		JButton browse = new JButton(frame.getApp().getText("loading.browse"));
 		browse.addActionListener(e -> {
 			JFileChooser chooser = new JFileChooser();
 			chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-			int choice = chooser.showDialog(this, "Select working dir");
+			int choice = chooser.showDialog(this, frame.getApp().getText("loading.workingdir.approve"));
 			if (choice == JFileChooser.APPROVE_OPTION) {
 				combo.addItem(chooser.getSelectedFile());
 			}
@@ -117,7 +111,7 @@ public class WorkingDirPanel extends JPanel {
 
 	@Override
 	public String toString() {
-		return "Working Dir";
+		return frame.getApp().getText("loading.workingdir.title");
 	}
 
 }

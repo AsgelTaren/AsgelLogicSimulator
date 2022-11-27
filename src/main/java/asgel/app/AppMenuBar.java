@@ -41,14 +41,14 @@ public class AppMenuBar extends JMenuBar {
 	}
 
 	private JMenu createFileMenu() {
-		JMenu res = new JMenu("File");
+		JMenu res = new JMenu(app.getText("filemenu.file"));
 
-		JMenuItem load = new JMenuItem("Load Model");
+		JMenuItem load = new JMenuItem(app.getText("filemenu.load"));
 		load.addActionListener(e -> {
 			JFileChooser chooser = new JFileChooser();
 			chooser.setCurrentDirectory(app.getWorkingDir());
 			chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-			int choice = chooser.showDialog(app.getJFrame(), "Select");
+			int choice = chooser.showDialog(app.getJFrame(), app.getText("filemenu.select"));
 			if (choice == JFileChooser.APPROVE_OPTION) {
 				try {
 					Model m = new Model(
@@ -63,20 +63,20 @@ public class AppMenuBar extends JMenuBar {
 		setIcon(load, "assets/open.png");
 		res.add(load);
 
-		JMenuItem create = new JMenuItem("New Model");
+		JMenuItem create = new JMenuItem(app.getText("filemenu.new"));
 		create.addActionListener(e -> {
 			app.setModel(new Model(), null);
 		});
 		setIcon(create, "assets/new.png");
 		res.add(create);
 
-		saveAs = new JMenuItem("Save As");
+		saveAs = new JMenuItem(app.getText("filemenu.saveas"));
 		saveAs.addActionListener(e -> {
 
 			JFileChooser chooser = new JFileChooser();
 			chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 			chooser.setCurrentDirectory(app.getWorkingDir());
-			int choice = chooser.showDialog(app.getJFrame(), "Select");
+			int choice = chooser.showDialog(app.getJFrame(), app.getText("filemenu.select"));
 			if (choice == JFileChooser.APPROVE_OPTION) {
 				if (!chooser.getSelectedFile().exists()) {
 					try {
@@ -96,7 +96,7 @@ public class AppMenuBar extends JMenuBar {
 		setIcon(saveAs, "assets/save.png");
 		res.add(saveAs);
 
-		save = new JMenuItem("Save");
+		save = new JMenuItem(app.getText("filemenu.save"));
 		save.addActionListener(e -> {
 			ModelHolder holder = app.getSelectedModelHolder();
 			if (holder.getFile() != null) {
@@ -106,7 +106,7 @@ public class AppMenuBar extends JMenuBar {
 		setIcon(save, "assets/save.png");
 		res.add(save);
 
-		close = new JMenuItem("Close Model");
+		close = new JMenuItem(app.getText("filemenu.close"));
 		close.addActionListener(e -> {
 			app.getHolderTabs().remove(app.getSelectedModelHolder());
 			DefaultTreeModel mod = (DefaultTreeModel) app.getObjectsTree().getModel();
@@ -123,9 +123,9 @@ public class AppMenuBar extends JMenuBar {
 	}
 
 	private JMenu createModelMenu() {
-		JMenu res = new JMenu("Model");
+		JMenu res = new JMenu(app.getText("modelmenu.title"));
 
-		exportAsBox = new JMenuItem("Export as Model Box");
+		exportAsBox = new JMenuItem(app.getText("modelmenu.export"));
 		exportAsBox.addActionListener(e -> {
 			ExportAsModelBoxDialog dialog = new ExportAsModelBoxDialog(app.getJFrame(), app,
 					app.getSelectedModelHolder());
@@ -138,16 +138,16 @@ public class AppMenuBar extends JMenuBar {
 	}
 
 	private JMenu createBundleMenu() {
-		JMenu res = new JMenu("Bundles");
+		JMenu res = new JMenu(app.getText("bundlemenu.title"));
 
-		JMenuItem show = new JMenuItem("Show Bundles");
+		JMenuItem show = new JMenuItem(app.getText("bundlemenu.show"));
 		show.addActionListener(e -> {
 			new BundleDialog(app.getJFrame(), app).showDialog();
 		});
 		setIcon(show, "assets/bundle.png");
 		res.add(show);
 
-		JMenuItem openFolder = new JMenuItem("Open Bundle folder");
+		JMenuItem openFolder = new JMenuItem(app.getText("bundlemenu.folder"));
 		openFolder.addActionListener(e -> {
 			try {
 				Desktop.getDesktop().open(new File(System.getenv("APPDATA") + "/AsgelLogicSim/bundles"));
@@ -170,9 +170,9 @@ public class AppMenuBar extends JMenuBar {
 	}
 
 	private JMenu createHelpMenu() {
-		JMenu res = new JMenu("Help");
+		JMenu res = new JMenu(app.getText("helpmenu.title"));
 
-		JMenuItem showLogs = new JMenuItem("Show Logs");
+		JMenuItem showLogs = new JMenuItem(app.getText("helpmenu.showlogs"));
 		showLogs.addActionListener(e -> Logger.INSTANCE.setVisible(true));
 		setIcon(showLogs, "assets/logs.png");
 		res.add(showLogs);

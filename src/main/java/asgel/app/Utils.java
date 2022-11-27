@@ -1,9 +1,11 @@
 package asgel.app;
 
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.nio.file.Files;
@@ -37,6 +39,18 @@ public class Utils {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	public static String loadFileAsString(InputStream in) throws IOException {
+		StringBuilder builder = new StringBuilder();
+		InputStreamReader reader = new InputStreamReader(in, "UTF-8");
+		BufferedReader br = new BufferedReader(reader);
+		String line;
+		while ((line = br.readLine()) != null) {
+			builder.append(line + "\n");
+		}
+		br.close();
+		return builder.toString();
 	}
 
 	public static void write(File f, String data) {

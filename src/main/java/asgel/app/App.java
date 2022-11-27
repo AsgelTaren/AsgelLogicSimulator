@@ -48,9 +48,6 @@ public class App {
 	private JTabbedPane holderTabs;
 	private ModelHolder previous;
 
-	// Bundles
-	private ArrayList<Bundle> bundles;
-
 	// Global Registry
 	private GlobalRegistry registry;
 
@@ -83,12 +80,14 @@ public class App {
 	}
 
 	public void start(LaunchConfig config) {
+		config.loadConfig();
 		Logger log = Logger.INSTANCE.derivateLogger("[LAUNCH]");
 		log.setVisible(true);
-		registry = new GlobalRegistry();
+		registry = new GlobalRegistry(config);
+		registry.loadAppTextAtlases();
 		log.log("Created Global Registry");
 
-		LoadingFrame loadFrame = new LoadingFrame();
+		LoadingFrame loadFrame = new LoadingFrame(this);
 		WorkingDirPanel dirPanel = new WorkingDirPanel(loadFrame, config);
 		BundleLoadingPanel bundlePanel = new BundleLoadingPanel(config, log, this);
 		loadFrame.build(dirPanel, bundlePanel);
@@ -128,7 +127,7 @@ public class App {
 		searchPanel.setLayout(new BoxLayout(searchPanel, BoxLayout.PAGE_AXIS));
 		searchPanel.add(searchBar);
 
-		searchPanel.setBorder(BorderFactory.createTitledBorder("Search"));
+		searchPanel.setBorder(BorderFactory.createTitledBorder(registry.getAppAtlas().getValue("rightmenu.search")));
 
 		right.add(searchPanel);
 
@@ -147,7 +146,8 @@ public class App {
 		searchBar.addActionListener(e -> {
 			ArrayList<ObjectEntry> searchResult = new ArrayList<ObjectEntry>();
 			if (searchBar.getText() != null && !searchBar.getText().equals(""))
-				for (BundleRegistry regis : registry.getRegistries().values()) {
+				for (Bundle bundle : registry.getBundles().values()) {
+					BundleRegistry regis = bundle.getBundleRegistry();
 					for (ObjectEntry entry : regis.OBJECT_REGISTRY.values()) {
 						if (entry.getFullID().contains(searchBar.getText())
 								|| entry.getName().contains(searchBar.getText())) {
@@ -216,25 +216,20 @@ public class App {
 		return frame;
 	}
 
-	public ArrayList<Bundle> getBundles() {
-		return bundles;
-	}
-
 	public GlobalRegistry getGlobalRegistry() {
 		return registry;
 	}
 
 	private void loadBundles(ArrayList<BundleLoadingPanel.BundleHolder> temp, IParametersRequester req) {
-		bundles = new ArrayList<Bundle>();
 		Logger log = Logger.INSTANCE.derivateLogger("[BUNDLES]");
 		for (BundleLoadingPanel.BundleHolder bundleHolder : temp) {
 			if (!bundleHolder.used) {
 				continue;
 			}
 			Bundle bundle = bundleHolder.b;
-			bundles.add(bundle);
-			registry.getRegistries().put(bundle.getID(), bundle.getBundleRegistry());
+			registry.addBundle(bundle);
 			try {
+				bundle.loadTextAtlas(registry.getCurrentLanguage(), log);
 				bundle.onLoad();
 				log.log("Loaded " + bundle.getID());
 			} catch (Exception e) {
@@ -245,8 +240,8 @@ public class App {
 		Logger reg = log.derivateLogger("[REGISTRY]");
 
 		reg.log("List of all registered object entires");
-		for (BundleRegistry regis : registry.getRegistries().values()) {
-			for (ObjectEntry entry : regis.OBJECT_REGISTRY.values()) {
+		for (Bundle bundle : registry.getBundles().values()) {
+			for (ObjectEntry entry : bundle.getBundleRegistry().OBJECT_REGISTRY.values()) {
 				reg.log(" -->" + entry.getFullID() + " : " + entry.getName());
 			}
 		}
@@ -257,16 +252,17 @@ public class App {
 
 		tabs = new HashMap<String, DefaultMutableTreeNode>();
 		entries = new HashMap<String, DefaultMutableTreeNode>();
-		for (BundleRegistry regis : registry.getRegistries().values()) {
-			for (ModelTab tab : regis.TAB_REGISTRY.values()) {
+
+		for (Bundle bundle : registry.getBundles().values()) {
+			for (ModelTab tab : bundle.getBundleRegistry().TAB_REGISTRY.values()) {
 				DefaultMutableTreeNode node = new DefaultMutableTreeNode(tab);
 				tabs.put(tab.getFullID(), node);
 				root.add(node);
 			}
 		}
 
-		for (BundleRegistry regis : registry.getRegistries().values()) {
-			for (ObjectEntry entry : regis.OBJECT_REGISTRY.values()) {
+		for (Bundle bundle : registry.getBundles().values()) {
+			for (ObjectEntry entry : bundle.getBundleRegistry().OBJECT_REGISTRY.values()) {
 				DefaultMutableTreeNode node = new DefaultMutableTreeNode(entry);
 				tabs.get(entry.getFullTab()).add(node);
 				entries.put(entry.getFullID(), node);
@@ -300,6 +296,10 @@ public class App {
 
 	public IParametersRequester getParametersRequester() {
 		return requester;
+	}
+
+	public String getText(String id) {
+		return registry.getAppAtlas().getValue(id);
 	}
 
 }

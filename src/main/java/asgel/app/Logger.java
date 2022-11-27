@@ -8,6 +8,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 /**
@@ -36,7 +37,7 @@ public class Logger {
 
 		area = new JTextArea();
 		area.setPreferredSize(new Dimension(600, 800));
-		panel.add(area, gbc);
+		panel.add(new JScrollPane(area), gbc);
 
 		JButton clear = new JButton("Clear Logs");
 		clear.addActionListener(e -> {

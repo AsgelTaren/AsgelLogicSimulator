@@ -20,10 +20,12 @@ public class LoadingFrame extends JDialog {
 	private JTabbedPane tabs;
 	private JPanel[] panels;
 	private JButton launch;
+	private App app;
 
-	public LoadingFrame() {
-		super((Frame) null, "Loading", true);
+	public LoadingFrame(App app) {
+		super((Frame) null, app.getText("loading.title"), true);
 		setIconImage(App.ICON);
+		this.app = app;
 	}
 
 	public void build(JPanel... panels) {
@@ -42,7 +44,7 @@ public class LoadingFrame extends JDialog {
 		gbc.gridheight = 1;
 		panel.add(tabs, gbc);
 
-		launch = new JButton("Launch");
+		launch = new JButton(app.getText("loading.launch"));
 		launch.addActionListener(e -> {
 			setVisible(false);
 			dispose();
@@ -53,7 +55,7 @@ public class LoadingFrame extends JDialog {
 		gbc.gridy = 1;
 		panel.add(launch, gbc);
 
-		JButton cancel = new JButton("Cancel");
+		JButton cancel = new JButton(app.getText("loading.cancel"));
 		cancel.addActionListener(e -> System.exit(0));
 		gbc.gridx = 1;
 		panel.add(cancel, gbc);
@@ -74,6 +76,10 @@ public class LoadingFrame extends JDialog {
 
 	public JButton getLaunchButton() {
 		return launch;
+	}
+
+	public App getApp() {
+		return app;
 	}
 
 }

@@ -1,5 +1,7 @@
 package asgel.app.bundle;
 
+import java.util.ArrayList;
+
 import javax.swing.table.AbstractTableModel;
 
 import asgel.app.App;
@@ -13,15 +15,17 @@ import asgel.core.bundle.Bundle;
 public class BundleTableModel extends AbstractTableModel {
 
 	private App app;
+	private ArrayList<Bundle> bundles;
 
 	public BundleTableModel(App app) {
 		super();
 		this.app = app;
+		bundles = new ArrayList<>(app.getGlobalRegistry().getBundles().values());
 	}
 
 	@Override
 	public int getRowCount() {
-		return app.getBundles().size();
+		return app.getGlobalRegistry().getBundles().size();
 	}
 
 	@Override
@@ -31,7 +35,7 @@ public class BundleTableModel extends AbstractTableModel {
 
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		Bundle b = app.getBundles().get(rowIndex);
+		Bundle b = bundles.get(rowIndex);
 		switch (columnIndex) {
 		case 0:
 			return b;
@@ -47,11 +51,11 @@ public class BundleTableModel extends AbstractTableModel {
 	public String getColumnName(int index) {
 		switch (index) {
 		case 0:
-			return "Name";
+			return app.getText("bundlesdialog.bundle.name");
 		case 1:
-			return "ID";
+			return app.getText("bundlesdialog.bundle.id");
 		case 2:
-			return "Desc";
+			return app.getText("bundlesdialog.bundle.desc");
 		}
 		return null;
 	}

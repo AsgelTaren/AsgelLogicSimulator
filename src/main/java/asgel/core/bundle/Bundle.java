@@ -67,6 +67,14 @@ public class Bundle {
 
 	}
 
+	public void loadTextAtlas(Language lang, Logger log) {
+		try {
+			registry.ATLAS.loadDataFrom(resolveBundleResource(lang.getSymbol() + ".lang"));
+		} catch (Exception e) {
+			log.log("Failed to load lang file for bundle with id: " + id + ". Reason : " + e.getMessage());
+		}
+	}
+
 	public static final Bundle preLoadBundle(File file, String id, String main, GlobalRegistry global,
 			IParametersRequester requester) throws Exception {
 		URLClassLoader child = new URLClassLoader(new URL[] { file.toURI().toURL() }, Bundle.class.getClassLoader());
@@ -75,15 +83,15 @@ public class Bundle {
 				IParametersRequester.class).newInstance(file, id, global, child, requester);
 	}
 
-	protected InputStream resolveFileResource(String name) {
+	public InputStream resolveFileResource(String name) {
 		return loader.getResourceAsStream(name);
 	}
 
-	protected InputStream resolveBundleResource(String name) {
+	public InputStream resolveBundleResource(String name) {
 		return loader.getResourceAsStream("assets/" + id + "/" + name);
 	}
 
-	protected BufferedImage resolveBundleImage(String name) {
+	public BufferedImage resolveBundleImage(String name) {
 		return Utils.loadImage(resolveBundleResource(name));
 	}
 

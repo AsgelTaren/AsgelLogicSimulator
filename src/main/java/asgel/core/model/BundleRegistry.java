@@ -21,6 +21,9 @@ public class BundleRegistry {
 	// Tabs registry
 	public final HashMap<String, ModelTab> TAB_REGISTRY = new HashMap<String, ModelTab>();
 
+	// Text entries
+	public final TextAtlas ATLAS = new TextAtlas();
+
 	// Bundle
 	private String bundle;
 
@@ -32,22 +35,25 @@ public class BundleRegistry {
 		return bundle;
 	}
 
-	public final void registerTab(ModelTab tab) {
-		if (tab == null)
-			return;
-		if (TAB_REGISTRY.containsKey(tab.getID())) {
+	public final ModelTab registerTab(String id) {
+		if (id == null || id.length() == 0)
+			return null;
+		if (TAB_REGISTRY.containsKey(id)) {
 			// Printing conflicts to log4j
 		}
-
+		ModelTab tab = new ModelTab(id);
+		tab.setName(ATLAS.getValue("tab." + tab.getID()));
 		TAB_REGISTRY.put(tab.getID(), tab.setRegistry(this));
+		return tab;
 	}
 
-	public final ObjectEntry registerObject(String id, String name, String tab_id, Function<Point, ModelOBJ> provider,
+	public final ObjectEntry registerObject(String id, String tab_id, Function<Point, ModelOBJ> provider,
 			Function<JsonObject, ModelOBJ> loader) {
 		if (OBJECT_REGISTRY.containsKey(id)) {
 
 		}
-		ObjectEntry entry = new ObjectEntry(id, name, tab_id, provider, loader).setRegistry(this);
+		ObjectEntry entry = new ObjectEntry(id, ATLAS.getValue("object." + id), tab_id, provider, loader)
+				.setRegistry(this);
 		OBJECT_REGISTRY.put(id, entry);
 		return entry;
 	}

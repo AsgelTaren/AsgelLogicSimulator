@@ -121,7 +121,7 @@ public class Model {
 
 	private void load(JsonObject json, GlobalRegistry regis) throws MissingBundleException {
 		for (JsonElement e : json.get("bundles").getAsJsonArray()) {
-			if (!regis.getRegistries().containsKey(e.getAsString())) {
+			if (!regis.getBundles().containsKey(e.getAsString())) {
 				throw new MissingBundleException("Missing " + e.getAsString());
 			}
 		}

@@ -15,9 +15,8 @@ public class ModelTab {
 	private Color color;
 	private BundleRegistry registry;
 
-	public ModelTab(String id, String name) {
+	public ModelTab(String id) {
 		this.id = id;
-		this.name = name;
 	}
 
 	public ModelTab setIcon(ImageIcon icon) {
@@ -41,6 +40,10 @@ public class ModelTab {
 
 	public String getName() {
 		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public String getID() {
