@@ -4,7 +4,9 @@ import java.awt.Color;
 import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import com.google.gson.JsonArray;
@@ -24,14 +26,18 @@ public class Model {
 	private ArrayList<ModelOBJ> objects;
 	private ArrayList<Link> links;
 
+	private HashMap<String, String> catIcons;
+
 	public Model() {
 		objects = new ArrayList<ModelOBJ>();
 		links = new ArrayList<Link>();
+		catIcons = new HashMap<>();
 	}
 
 	public Model(JsonObject obj, GlobalRegistry regis) throws MissingBundleException {
 		objects = new ArrayList<ModelOBJ>();
 		links = new ArrayList<Link>();
+		catIcons = new HashMap<>();
 		load(obj, regis);
 	}
 
@@ -108,6 +114,11 @@ public class Model {
 			linkArr.add(json);
 		}
 
+		JsonObject catIconsOBJ = new JsonObject();
+		for (Entry<String, String> entry : catIcons.entrySet()) {
+			catIconsOBJ.addProperty(entry.getKey(), entry.getValue());
+		}
+
 		JsonArray bundleArr = new JsonArray();
 		for (String s : usedBundles) {
 			bundleArr.add(s);
@@ -116,6 +127,7 @@ public class Model {
 		res.add("bundles", bundleArr);
 		res.add("objects", objArr);
 		res.add("links", linkArr);
+		res.add("catIcons", catIconsOBJ);
 		return res;
 	}
 
@@ -131,7 +143,6 @@ public class Model {
 			ObjectEntry entry = regis.getObjectEntry(obj.get("entry").getAsString());
 			objects.add(entry.getLoader().apply(obj));
 		}
-
 		for (JsonElement e : json.get("links").getAsJsonArray()) {
 			JsonObject obj = e.getAsJsonObject();
 			Link l = Link.create(objects.get(obj.get("startOBJ").getAsInt()).getPins()[obj.get("startPin").getAsInt()],
@@ -149,6 +160,14 @@ public class Model {
 			l.getEnd().setLink(l);
 			links.add(l);
 		}
+		if (json.has("catIcons"))
+			for (Entry<String, JsonElement> entry : json.get("catIcons").getAsJsonObject().entrySet()) {
+				catIcons.put(entry.getKey(), entry.getValue().getAsString());
+			}
+	}
+
+	public HashMap<String, String> getCatIcons() {
+		return catIcons;
 	}
 
 }

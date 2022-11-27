@@ -13,15 +13,19 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import asgel.app.App;
+import asgel.app.Logger;
 import asgel.app.ObjectCategory;
+import asgel.app.Utils;
 import asgel.core.gfx.Point;
 import asgel.core.gfx.Renderer;
 import asgel.core.model.BundleRegistry.ObjectEntry;
@@ -85,6 +89,7 @@ public class ModelHolder extends JPanel
 	private DefaultMutableTreeNode root, def, cats;
 	private HashMap<String, DefaultMutableTreeNode> nodes;
 	private HashMap<ModelOBJ, DefaultMutableTreeNode> objNodes;
+	private HashMap<String, ImageIcon> catIconsInstances;
 
 	public ModelHolder(Model model, App app, String name, File f) {
 		super();
@@ -113,6 +118,7 @@ public class ModelHolder extends JPanel
 		renderer.addKeyListener(this);
 
 		// Node representation
+		reloadCatIcons();
 		createNodeRepresentation();
 	}
 
@@ -435,6 +441,22 @@ public class ModelHolder extends JPanel
 		}
 	}
 
+	public void reloadCatIcons() {
+		catIconsInstances = new HashMap<>();
+		for (String val : model.getCatIcons().values()) {
+			try {
+				File target = Utils.resolvePath(file, app.getWorkingDir(), val);
+				ImageIcon result = Utils.loadIcon(new FileInputStream(target), 16);
+				catIconsInstances.put(val, result);
+			} catch (Exception e) {
+				e.printStackTrace();
+				Logger.INSTANCE.log("Error while trying to load icons under id: " + val);
+			}
+		}
+		System.out.println(model.getCatIcons());
+		System.out.println(catIconsInstances);
+	}
+
 	public DefaultMutableTreeNode getNodeRepresentation() {
 		return root;
 	}
@@ -479,6 +501,10 @@ public class ModelHolder extends JPanel
 
 	public App getApp() {
 		return app;
+	}
+
+	public HashMap<String, ImageIcon> getCatIconsInstances() {
+		return catIconsInstances;
 	}
 
 	public Renderer getRenderer() {

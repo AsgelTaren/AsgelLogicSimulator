@@ -85,4 +85,11 @@ public class Utils {
 		return null;
 	}
 
+	public static File resolvePath(File from, File workingDir, String path) {
+		String[] split = path.split(":");
+		return new File(
+				(split[0].equals("relative") ? from.getParentFile().getAbsolutePath() : workingDir.getAbsolutePath())
+						+ "/" + split[1]);
+	}
+
 }

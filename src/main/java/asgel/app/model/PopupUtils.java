@@ -1,15 +1,19 @@
 package asgel.app.model;
 
 import java.awt.Color;
+import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JColorChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
 import asgel.app.App;
+import asgel.app.FileLookerDialog;
 import asgel.core.model.Link;
 import asgel.core.model.ModelOBJ;
 import asgel.core.model.Pin;
@@ -114,4 +118,46 @@ public class PopupUtils {
 		return menu;
 	}
 
+	public static JPopupMenu forCat(ModelHolder holder, String cat, App app) {
+		JPopupMenu res = new JPopupMenu();
+
+		JMenuItem setIcon = new JMenuItem("Set Icon");
+		setIcon.addActionListener(act -> {
+			try {
+				FileLookerDialog dialog = new FileLookerDialog(app.getJFrame(), app.getWorkingDir(),
+						app.getText("iconselection"), f -> f.getName().toLowerCase().endsWith(".png"));
+				dialog.setVisible(true);
+				if (dialog.getResult() != null) {
+					File target = dialog.getResult();
+					if (target.toPath().startsWith(holder.getFile().getParentFile().toPath().toAbsolutePath())) {
+						int choice = JOptionPane.showConfirmDialog(app.getJFrame(),
+								"You can use this icons through an relative url. This allows you to make your file and icons portable. Do you want to proceed?",
+								"WARNING", JOptionPane.YES_NO_OPTION);
+						if (choice == JOptionPane.YES_OPTION) {
+							String url = "relative:"
+									+ holder.getFile().getParentFile().toPath().relativize(target.toPath()).toString();
+							holder.getModel().getCatIcons().put(cat, url);
+						} else {
+							String url = "absolute:" + Path.of(app.getWorkingDir().getCanonicalPath())
+									.relativize(target.toPath()).toString();
+							holder.getModel().getCatIcons().put(cat, url);
+						}
+						app.getObjectsTree().repaint();
+						System.out.println(holder.getModel().getCatIcons());
+					} else {
+						String url = "absolute:" + Path.of(app.getWorkingDir().getCanonicalPath())
+								.relativize(target.toPath()).toString();
+						holder.getModel().getCatIcons().put(cat, url);
+					}
+					holder.reloadCatIcons();
+
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		});
+		res.add(setIcon);
+
+		return res;
+	}
 }

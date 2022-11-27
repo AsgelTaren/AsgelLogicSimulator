@@ -20,7 +20,7 @@ import asgel.core.model.ModelTab;
 @SuppressWarnings("serial")
 public class OBJTreeRenderer extends DefaultTreeCellRenderer {
 
-	private static Font tabFont = new Font("Manrope", Font.BOLD, 12), defFont = new Font("Manrope", Font.PLAIN, 12);
+	private static Font tabFont = new Font("Manrope", Font.BOLD, 14), defFont = new Font("Manrope", Font.PLAIN, 12);
 
 	private ArrayList<ObjectEntry> searchResult;
 
@@ -52,7 +52,7 @@ public class OBJTreeRenderer extends DefaultTreeCellRenderer {
 			if (searchResult.contains(entry)) {
 				res.setForeground(Color.GREEN);
 			}
-			res.setIcon(((ModelTab) ((DefaultMutableTreeNode) node.getParent()).getUserObject()).getIcon());
+			res.setIcon(entry.getTabInstance().getIcon());
 
 		}
 		return res;

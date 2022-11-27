@@ -14,7 +14,7 @@ public interface IParametersRequester {
 
 	public int[] getParametersAsInt(String... args);
 
-	public File getFile();
+	public File getFile(String folder);
 
 	public File getWorkingDir();
 

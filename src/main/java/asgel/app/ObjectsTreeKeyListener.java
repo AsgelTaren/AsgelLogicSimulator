@@ -24,6 +24,7 @@ public class ObjectsTreeKeyListener implements KeyListener {
 			ModelHolder holder = app.getSelectedModelHolder();
 			if (holder != null) {
 				holder.rebuildNodeRepresentation();
+				holder.reloadCatIcons();
 				app.updateObjectsTree();
 			}
 		}

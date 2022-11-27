@@ -2,6 +2,8 @@ package asgel.app;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
@@ -19,6 +21,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -28,6 +31,7 @@ import asgel.app.bundle.BundleLoadingPanel;
 import asgel.app.model.ModelHolder;
 import asgel.app.model.OBJTreeRenderer;
 import asgel.app.model.OBJTreeTransferHandler;
+import asgel.app.model.PopupUtils;
 import asgel.core.bundle.Bundle;
 import asgel.core.model.BundleRegistry;
 import asgel.core.model.BundleRegistry.ObjectEntry;
@@ -80,11 +84,13 @@ public class App {
 	}
 
 	public void start(LaunchConfig config) {
+		App instance = this;
 		config.loadConfig();
 		Logger log = Logger.INSTANCE.derivateLogger("[LAUNCH]");
 		log.setVisible(true);
 		registry = new GlobalRegistry(config);
 		registry.loadAppTextAtlases();
+		requester = new ParametersRequester(this);
 		log.log("Created Global Registry");
 
 		LoadingFrame loadFrame = new LoadingFrame(this);
@@ -98,7 +104,9 @@ public class App {
 		log.log("Selected working dir: " + workingDir);
 		dirPanel.storeDirs(config);
 
-		requester = new ParametersRequester(this);
+		File objects = new File(workingDir.getAbsolutePath() + "/models");
+		objects.mkdir();
+
 		loadBundles(bundlePanel.getBundles(), requester);
 
 		frame = new JFrame("AsgelLogicSimulator origins");
@@ -112,6 +120,23 @@ public class App {
 		objectsTree.setTransferHandler(new ObjectsTreeTransferHandler(this));
 		objectsTree.setDragEnabled(true);
 		objectsTree.addKeyListener(new ObjectsTreeKeyListener(this));
+		objectsTree.addMouseListener(new MouseAdapter() {
+
+			@Override
+			public void mousePressed(MouseEvent e) {
+				if (SwingUtilities.isRightMouseButton(e)) {
+					Object node = objectsTree.getLastSelectedPathComponent();
+					if (node == null)
+						return;
+					Object target = ((DefaultMutableTreeNode) node).getUserObject();
+					if (target instanceof ObjectCategory obj) {
+						PopupUtils.forCat(previous, obj.toString(), instance).show(e.getComponent(), e.getX(),
+								e.getY());
+					}
+				}
+			}
+		});
+		objectsTree.setCellRenderer(new ObjectTreeRenderer(this));
 		JScrollPane objectsScroll = new JScrollPane(objectsTree);
 
 		// Right-side panel
@@ -231,6 +256,7 @@ public class App {
 			try {
 				bundle.loadTextAtlas(registry.getCurrentLanguage(), log);
 				bundle.onLoad();
+				bundle.getBundleRegistry().linkTabInstances();
 				log.log("Loaded " + bundle.getID());
 			} catch (Exception e) {
 				e.printStackTrace();

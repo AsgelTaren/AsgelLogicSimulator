@@ -96,6 +96,8 @@ public abstract class ModelOBJ {
 		json.addProperty("entry", entry.getFullID());
 		json.addProperty("moveable", isMoveable);
 		json.addProperty("name", name);
+		if (category != null)
+			json.addProperty("cat", category);
 		toJsonInternal(json);
 		return json;
 	}

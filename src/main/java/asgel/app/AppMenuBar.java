@@ -75,7 +75,7 @@ public class AppMenuBar extends JMenuBar {
 
 			JFileChooser chooser = new JFileChooser();
 			chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-			chooser.setCurrentDirectory(app.getWorkingDir());
+			chooser.setCurrentDirectory(new File(app.getWorkingDir().getAbsoluteFile() + "/models"));
 			int choice = chooser.showDialog(app.getJFrame(), app.getText("filemenu.select"));
 			if (choice == JFileChooser.APPROVE_OPTION) {
 				if (!chooser.getSelectedFile().exists()) {

@@ -133,10 +133,10 @@ public class ParametersRequester implements IParametersRequester {
 	}
 
 	@Override
-	public File getFile() {
+	public File getFile(String folder) {
 		JFileChooser chooser = new JFileChooser();
 		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		chooser.setCurrentDirectory(app.getWorkingDir());
+		chooser.setCurrentDirectory(new File(app.getWorkingDir() + "/" + folder));
 		int choice = chooser.showOpenDialog(app.getJFrame());
 		if (choice == JFileChooser.APPROVE_OPTION) {
 			return chooser.getSelectedFile();

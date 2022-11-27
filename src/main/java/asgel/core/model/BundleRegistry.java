@@ -58,6 +58,12 @@ public class BundleRegistry {
 		return entry;
 	}
 
+	public void linkTabInstances() {
+		for (ObjectEntry entry : OBJECT_REGISTRY.values()) {
+			entry.collectTabInstance();
+		}
+	}
+
 	public class ObjectEntry {
 
 		private String id, name;
@@ -66,6 +72,7 @@ public class BundleRegistry {
 		private Function<JsonObject, ModelOBJ> loader;
 
 		private String tab;
+		private ModelTab tabInstance;
 
 		private BufferedImage background;
 
@@ -93,13 +100,22 @@ public class BundleRegistry {
 						res.setName(j.get("name").getAsString());
 					if (j.has("moveable"))
 						res.setMoveable(j.get("moveable").getAsBoolean());
-
+					if (j.has("cat"))
+						res.setCategory(j.get("cat").getAsString());
 					res.loadPins(j);
 				}
 				return res;
 			};
 			this.tab = tab;
 
+		}
+
+		public void collectTabInstance() {
+			this.tabInstance = this.registry.TAB_REGISTRY.get(tab);
+		}
+
+		public ModelTab getTabInstance() {
+			return tabInstance;
 		}
 
 		public String getId() {
