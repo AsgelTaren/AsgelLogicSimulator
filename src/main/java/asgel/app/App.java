@@ -79,6 +79,9 @@ public class App {
 	public static final BufferedImage ICON = Utils
 			.loadImage(App.class.getClassLoader().getResourceAsStream("logo.png"));
 
+	// Working File
+	private File workingFile;
+
 	public App() {
 
 	}
@@ -103,9 +106,6 @@ public class App {
 		workingDir = dirPanel.getWorkingDir();
 		log.log("Selected working dir: " + workingDir);
 		dirPanel.storeDirs(config);
-
-		File objects = new File(workingDir.getAbsolutePath() + "/models");
-		objects.mkdir();
 
 		loadBundles(bundlePanel.getBundles(), requester);
 
@@ -206,6 +206,7 @@ public class App {
 			if (previous != null) {
 				previous.start();
 				((DefaultTreeModel) objectsTree.getModel()).setRoot(previous.getNodeRepresentation());
+				workingFile = previous.getFile();
 			}
 			menubar.updateOnChange();
 		});
@@ -302,10 +303,18 @@ public class App {
 	}
 
 	public void setModel(Model m, File f) {
-		ModelHolder holder = new ModelHolder(m, this, "<Untitled " + holderTabs.getComponentCount() + ">", f);
+		ModelHolder holder = new ModelHolder(m, this, "<Untitled " + holderTabs.getComponentCount() + ">");
 		holderTabs.add(holder.toString(), holder);
 		holderTabs.setSelectedComponent(holder);
 		holderTabs.repaint();
+	}
+
+	public File getWorkingFile() {
+		return workingFile;
+	}
+
+	public void setWorkingFile(File f) {
+		this.workingFile = f;
 	}
 
 	public JTabbedPane getHolderTabs() {

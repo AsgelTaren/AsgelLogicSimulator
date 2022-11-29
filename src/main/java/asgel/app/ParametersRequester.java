@@ -154,4 +154,13 @@ public class ParametersRequester implements IParametersRequester {
 		return app.getJFrame();
 	}
 
+	@Override
+	public App getApp() {
+		return app;
+	}
+
+	@Override
+	public File getWorkingFile() {
+		return app.getWorkingFile();
+	}
 }

@@ -51,12 +51,14 @@ public class AppMenuBar extends JMenuBar {
 			int choice = chooser.showDialog(app.getJFrame(), app.getText("filemenu.select"));
 			if (choice == JFileChooser.APPROVE_OPTION) {
 				try {
+					app.setWorkingFile(chooser.getSelectedFile());
 					Model m = new Model(
 							JsonParser.parseReader(new FileReader(chooser.getSelectedFile())).getAsJsonObject(),
-							app.getGlobalRegistry());
+							app.getGlobalRegistry(), chooser.getSelectedFile());
 					app.setModel(m, chooser.getSelectedFile());
 				} catch (Exception ex) {
 					ex.printStackTrace();
+					app.setWorkingFile(null);
 				}
 			}
 		});
@@ -65,7 +67,7 @@ public class AppMenuBar extends JMenuBar {
 
 		JMenuItem create = new JMenuItem(app.getText("filemenu.new"));
 		create.addActionListener(e -> {
-			app.setModel(new Model(), null);
+			app.setModel(new Model(null), null);
 		});
 		setIcon(create, "assets/new.png");
 		res.add(create);
@@ -75,7 +77,7 @@ public class AppMenuBar extends JMenuBar {
 
 			JFileChooser chooser = new JFileChooser();
 			chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-			chooser.setCurrentDirectory(new File(app.getWorkingDir().getAbsoluteFile() + "/models"));
+			chooser.setCurrentDirectory(app.getWorkingDir());
 			int choice = chooser.showDialog(app.getJFrame(), app.getText("filemenu.select"));
 			if (choice == JFileChooser.APPROVE_OPTION) {
 				if (!chooser.getSelectedFile().exists()) {
@@ -110,7 +112,8 @@ public class AppMenuBar extends JMenuBar {
 		close.addActionListener(e -> {
 			app.getHolderTabs().remove(app.getSelectedModelHolder());
 			DefaultTreeModel mod = (DefaultTreeModel) app.getObjectsTree().getModel();
-			mod.setRoot(null);
+			ModelHolder holder = app.getSelectedModelHolder();
+			mod.setRoot(holder != null ? holder.getNodeRepresentation() : null);
 			mod.reload();
 			app.getHolderTabs().repaint();
 			app.getJFrame().revalidate();

@@ -9,9 +9,12 @@ import java.io.InputStreamReader;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 /**
  * @author Florent Guille
@@ -54,6 +57,14 @@ public class Utils {
 	}
 
 	public static void write(File f, String data) {
+		if (!f.exists()) {
+			f.getParentFile().mkdirs();
+			try {
+				f.createNewFile();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 		try {
 			Files.writeString(f.toPath(), data);
 		} catch (IOException e) {
@@ -86,10 +97,25 @@ public class Utils {
 	}
 
 	public static File resolvePath(File from, File workingDir, String path) {
+		if (!path.contains(":")) {
+			return new File(workingDir.getAbsolutePath() + "/" + path);
+		}
 		String[] split = path.split(":");
 		return new File(
 				(split[0].equals("relative") ? from.getParentFile().getAbsolutePath() : workingDir.getAbsolutePath())
 						+ "/" + split[1]);
+	}
+
+	public static String askForRelativity(Path from, Path target, Path workingDir, JFrame frame) {
+		if (target.toAbsolutePath().startsWith(from.toAbsolutePath())) {
+			int choice = JOptionPane.showConfirmDialog(frame,
+					"You can use this icons through an relative url. This allows you to make your file and icons portable. Do you want to proceed?",
+					"WARNING", JOptionPane.YES_NO_OPTION);
+			if (choice == JOptionPane.YES_OPTION) {
+				return "relative:" + from.toAbsolutePath().relativize(target.toAbsolutePath());
+			}
+		}
+		return "absolute:" + workingDir.toAbsolutePath().relativize(target.toAbsolutePath());
 	}
 
 }

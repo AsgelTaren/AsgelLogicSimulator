@@ -83,7 +83,6 @@ public class ModelHolder extends JPanel
 
 	// Name
 	private String name;
-	private File file;
 
 	// Node representation
 	private DefaultMutableTreeNode root, def, cats;
@@ -91,12 +90,11 @@ public class ModelHolder extends JPanel
 	private HashMap<ModelOBJ, DefaultMutableTreeNode> objNodes;
 	private HashMap<String, ImageIcon> catIconsInstances;
 
-	public ModelHolder(Model model, App app, String name, File f) {
+	public ModelHolder(Model model, App app, String name) {
 		super();
 		this.model = model;
 		this.app = app;
 		this.name = name;
-		this.file = f;
 		objToAdd = new ArrayList<ModelOBJ>();
 
 		setLayout(new GridBagLayout());
@@ -445,7 +443,7 @@ public class ModelHolder extends JPanel
 		catIconsInstances = new HashMap<>();
 		for (String val : model.getCatIcons().values()) {
 			try {
-				File target = Utils.resolvePath(file, app.getWorkingDir(), val);
+				File target = Utils.resolvePath(model.getFile(), app.getWorkingDir(), val);
 				ImageIcon result = Utils.loadIcon(new FileInputStream(target), 16);
 				catIconsInstances.put(val, result);
 			} catch (Exception e) {
@@ -485,7 +483,7 @@ public class ModelHolder extends JPanel
 			}
 		}
 		if (e.getKeyCode() == KeyEvent.VK_S && e.isControlDown()) {
-			if (file == null) {
+			if (model.getFile() == null) {
 				app.getMenuBar().saveAs();
 			} else {
 				app.getMenuBar().save();
@@ -516,16 +514,16 @@ public class ModelHolder extends JPanel
 	}
 
 	public File getFile() {
-		return file;
+		return model.getFile();
 	}
 
 	public void setFile(File f) {
-		this.file = f;
+		this.model.setFile(f);
 	}
 
 	@Override
 	public String toString() {
-		return file != null ? file.getName() : name;
+		return model.getFile() != null ? model.getFile().getName() : name;
 	}
 
 }

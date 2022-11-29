@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -28,26 +29,33 @@ public class Model {
 
 	private HashMap<String, String> catIcons;
 
-	public Model() {
+	private File file;
+
+	public Model(File file) {
 		objects = new ArrayList<ModelOBJ>();
 		links = new ArrayList<Link>();
 		catIcons = new HashMap<>();
+		this.file = file;
 	}
 
-	public Model(JsonObject obj, GlobalRegistry regis) throws MissingBundleException {
+	public Model(JsonObject obj, GlobalRegistry regis, File file) throws MissingBundleException {
 		objects = new ArrayList<ModelOBJ>();
 		links = new ArrayList<Link>();
 		catIcons = new HashMap<>();
+		this.file = file;
 		load(obj, regis);
+
 	}
 
 	public Model(File f, GlobalRegistry regis) throws Exception {
 		objects = new ArrayList<ModelOBJ>();
 		links = new ArrayList<Link>();
+		catIcons = new HashMap<>();
+		this.file = f;
 		load(JsonParser.parseReader(new FileReader(f)).getAsJsonObject(), regis);
 	}
 
-	public void refresh(ArrayList<? extends ModelOBJ> start) {
+	public void refresh(List<? extends ModelOBJ> start) {
 		ArrayList<ModelOBJ> toCheck = new ArrayList<ModelOBJ>(start);
 
 		while (!toCheck.isEmpty()) {
@@ -57,7 +65,7 @@ public class Model {
 				for (Pin p : obj.getPins()) {
 					if (!(p.isInput() || p.getLink() == null || p.getLink().isCoherent())) {
 						p.getLink().transmitData();
-						if (!next.contains(p.getLink().getEnd().getModelOBJ()) && p.isSensible()) {
+						if (!next.contains(p.getLink().getEnd().getModelOBJ()) && p.getLink().getEnd().isSensible()) {
 							next.add(p.getLink().getEnd().getModelOBJ());
 						}
 					}
@@ -132,16 +140,17 @@ public class Model {
 	}
 
 	private void load(JsonObject json, GlobalRegistry regis) throws MissingBundleException {
-		for (JsonElement e : json.get("bundles").getAsJsonArray()) {
-			if (!regis.getBundles().containsKey(e.getAsString())) {
-				throw new MissingBundleException("Missing " + e.getAsString());
+		if (json.has("bundles"))
+			for (JsonElement e : json.get("bundles").getAsJsonArray()) {
+				if (!regis.getBundles().containsKey(e.getAsString())) {
+					throw new MissingBundleException("Missing " + e.getAsString());
+				}
 			}
-		}
 
 		for (JsonElement e : json.get("objects").getAsJsonArray()) {
 			JsonObject obj = e.getAsJsonObject();
 			ObjectEntry entry = regis.getObjectEntry(obj.get("entry").getAsString());
-			objects.add(entry.getLoader().apply(obj));
+			objects.add(entry.getLoader().apply(new ObjectData(obj, this)));
 		}
 		for (JsonElement e : json.get("links").getAsJsonArray()) {
 			JsonObject obj = e.getAsJsonObject();
@@ -170,4 +179,11 @@ public class Model {
 		return catIcons;
 	}
 
+	public File getFile() {
+		return file;
+	}
+
+	public void setFile(File file) {
+		this.file = file;
+	}
 }

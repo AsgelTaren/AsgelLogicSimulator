@@ -4,8 +4,6 @@ import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.function.Function;
 
-import com.google.gson.JsonObject;
-
 import asgel.core.gfx.Direction;
 import asgel.core.gfx.Point;
 
@@ -48,7 +46,7 @@ public class BundleRegistry {
 	}
 
 	public final ObjectEntry registerObject(String id, String tab_id, Function<Point, ModelOBJ> provider,
-			Function<JsonObject, ModelOBJ> loader) {
+			Function<ObjectData, ModelOBJ> loader) {
 		if (OBJECT_REGISTRY.containsKey(id)) {
 
 		}
@@ -69,7 +67,7 @@ public class BundleRegistry {
 		private String id, name;
 		private BundleRegistry registry;
 		private Function<Point, ModelOBJ> provider;
-		private Function<JsonObject, ModelOBJ> loader;
+		private Function<ObjectData, ModelOBJ> loader;
 
 		private String tab;
 		private ModelTab tabInstance;
@@ -77,7 +75,7 @@ public class BundleRegistry {
 		private BufferedImage background;
 
 		public ObjectEntry(String id, String name, String tab, Function<Point, ModelOBJ> provider,
-				Function<JsonObject, ModelOBJ> loader) {
+				Function<ObjectData, ModelOBJ> loader) {
 			this.id = id;
 			this.name = name;
 
@@ -95,14 +93,14 @@ public class BundleRegistry {
 				if (res != null) {
 					res.setEntry(this);
 					res.placePins();
-					res.setRotation(Direction.valueOf(j.get("rot").getAsString()));
-					if (j.has("name"))
-						res.setName(j.get("name").getAsString());
-					if (j.has("moveable"))
-						res.setMoveable(j.get("moveable").getAsBoolean());
-					if (j.has("cat"))
-						res.setCategory(j.get("cat").getAsString());
-					res.loadPins(j);
+					res.setRotation(Direction.valueOf(j.json.get("rot").getAsString()));
+					if (j.json.has("name"))
+						res.setName(j.json.get("name").getAsString());
+					if (j.json.has("moveable"))
+						res.setMoveable(j.json.get("moveable").getAsBoolean());
+					if (j.json.has("cat"))
+						res.setCategory(j.json.get("cat").getAsString());
+					res.loadPins(j.json);
 				}
 				return res;
 			};
@@ -130,7 +128,7 @@ public class BundleRegistry {
 			return provider;
 		}
 
-		public Function<JsonObject, ModelOBJ> getLoader() {
+		public Function<ObjectData, ModelOBJ> getLoader() {
 			return loader;
 		}
 
