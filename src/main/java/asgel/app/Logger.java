@@ -36,8 +36,11 @@ public class Logger {
 		gbc.fill = GridBagConstraints.BOTH;
 
 		area = new JTextArea();
-		area.setPreferredSize(new Dimension(600, 800));
-		panel.add(new JScrollPane(area), gbc);
+		area.setLineWrap(true);
+		JScrollPane scroll = new JScrollPane(area);
+		scroll.setPreferredSize(new Dimension(600, 800));
+		scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		panel.add(scroll, gbc);
 
 		JButton clear = new JButton("Clear Logs");
 		clear.addActionListener(e -> {
