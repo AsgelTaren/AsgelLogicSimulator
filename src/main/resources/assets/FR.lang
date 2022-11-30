@@ -5,6 +5,7 @@
 "filemenu.saveas":"Enregistrer sous",
 "filemenu.save":"Enregistrer",
 "filemenu.close":"Fermer le fichier",
+"filemenu.select":"Sélectionner",
 "modelmenu.title":"Modèle",
 "modelmenu.export":"Exporter",
 "bundlemenu.title":"Bundles",
