@@ -1,7 +1,7 @@
 package asgel.app;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -16,7 +16,6 @@ import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.JTree;
@@ -116,7 +115,6 @@ public class App {
 
 		// Objects Tree
 		objectsTree = new JTree((DefaultMutableTreeNode) null);
-		objectsTree.setPreferredSize(new Dimension(400, 500));
 		objectsTree.setTransferHandler(new ObjectsTreeTransferHandler(this));
 		objectsTree.setDragEnabled(true);
 		objectsTree.addKeyListener(new ObjectsTreeKeyListener(this));
@@ -141,12 +139,16 @@ public class App {
 
 		// Right-side panel
 		JPanel right = new JPanel();
-		right.setLayout(new BoxLayout(right, BoxLayout.PAGE_AXIS));
+		right.setLayout(new GridBagLayout());
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.gridheight = gbc.gridwidth = 1;
+		gbc.weightx = 1;
+		gbc.weighty = 1;
+		gbc.fill = GridBagConstraints.BOTH;
 
 		searchBar = new JTextField();
-		searchBar.setPreferredSize(new Dimension(200, 25));
-		searchBar.setMaximumSize(new Dimension(200, 25));
-		searchBar.setMinimumSize(new Dimension(200, 25));
 
 		JPanel searchPanel = new JPanel();
 		searchPanel.setLayout(new BoxLayout(searchPanel, BoxLayout.PAGE_AXIS));
@@ -154,7 +156,8 @@ public class App {
 
 		searchPanel.setBorder(BorderFactory.createTitledBorder(registry.getAppAtlas().getValue("rightmenu.search")));
 
-		right.add(searchPanel);
+		gbc.weighty = 0;
+		right.add(searchPanel, gbc);
 
 		// Registry Tree
 		buildTree();
@@ -165,7 +168,9 @@ public class App {
 		registryTree.setCellRenderer(registryTreeRend = new OBJTreeRenderer());
 
 		JScrollPane scroll = new JScrollPane(registryTree);
-		right.add(scroll);
+		gbc.gridy++;
+		gbc.weighty = 1;
+		right.add(scroll, gbc);
 
 		// Search Bar Listener
 		searchBar.addActionListener(e -> {
@@ -190,8 +195,6 @@ public class App {
 			registryTree.repaint();
 		});
 
-		frame.add(right, BorderLayout.EAST);
-
 		// MenuBar
 		menubar = new AppMenuBar(this);
 		menubar.init();
@@ -211,9 +214,24 @@ public class App {
 			menubar.updateOnChange();
 		});
 
-		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, objectsScroll, holderTabs);
-		splitPane.setDividerLocation(250);
-		frame.add(splitPane, BorderLayout.CENTER);
+		frame.setLayout(new GridBagLayout());
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.gridheight = gbc.gridwidth = 1;
+		gbc.weightx = 1;
+		gbc.weighty = 1;
+		gbc.fill = GridBagConstraints.BOTH;
+
+		gbc.weightx = 0.2;
+
+		frame.add(objectsScroll, gbc);
+		gbc.gridx++;
+		gbc.weightx = 1;
+		frame.add(holderTabs, gbc);
+		gbc.gridx++;
+		gbc.weightx = 0.2;
+		frame.add(right, gbc);
 
 		frame.pack();
 		frame.setExtendedState(JFrame.MAXIMIZED_BOTH);

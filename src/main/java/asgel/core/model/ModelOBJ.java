@@ -37,6 +37,8 @@ public abstract class ModelOBJ {
 	// Pins
 	protected Pin[] pins;
 
+	private boolean showName, showAligns;
+
 	// Category
 	private String category;
 
@@ -117,6 +119,16 @@ public abstract class ModelOBJ {
 		renderer.push();
 		renderer.translate(x, y);
 		renderer.applyRot(rot, new Point(width >> 1, height >> 1));
+
+		if (showName) {
+			renderer.drawString(name, width + 10, height + 10, Color.BLACK);
+		}
+		if (showAligns) {
+			renderer.drawLine(-1000, 0, 1000, 0, Color.BLACK);
+			renderer.drawLine(-1000, height, 1000, height, Color.BLACK);
+			renderer.drawLine(0, -1000, 0, 1000, Color.BLACK);
+			renderer.drawLine(width, -1000, width, 1000, Color.BLACK);
+		}
 		if (entry.getBackground() != null) {
 			renderer.drawImage(entry.getBackground(), 0, 0, width, height);
 			if (highOBJ == this) {
@@ -237,6 +249,22 @@ public abstract class ModelOBJ {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public boolean showName() {
+		return showName;
+	}
+
+	public boolean showAligns() {
+		return showAligns;
+	}
+
+	public void setShowName(boolean showName) {
+		this.showName = showName;
+	}
+
+	public void setShowAligns(boolean showAligns) {
+		this.showAligns = showAligns;
 	}
 
 	@Override

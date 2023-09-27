@@ -8,6 +8,7 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JColorChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
 import asgel.app.App;
@@ -27,6 +28,12 @@ public class PopupUtils {
 		JPopupMenu menu = new JPopupMenu();
 
 		JMenuItem setName = new JMenuItem("Set Name");
+		setName.addActionListener(e -> {
+			String choice = JOptionPane.showInputDialog(holder, "Enter desired name for " + obj);
+			if (choice != null) {
+				obj.setName(choice);
+			}
+		});
 		menu.add(setName);
 
 		JCheckBoxMenuItem moveable = new JCheckBoxMenuItem("Moveable");
@@ -63,6 +70,16 @@ public class PopupUtils {
 			holder.getModel().refresh(list);
 		});
 		menu.add(remove);
+
+		JMenuItem showName = new JCheckBoxMenuItem("Show Name");
+		showName.setSelected(obj.showName());
+		showName.addActionListener(e -> obj.setShowName(showName.isSelected()));
+		menu.add(showName);
+		
+		JMenuItem showAligns = new JCheckBoxMenuItem("Show Aligns");
+		showAligns.setSelected(obj.showAligns());
+		showAligns.addActionListener(e -> obj.setShowAligns(showAligns.isSelected()));
+		menu.add(showAligns);
 
 		JMenu custom = obj.getPopupMenu(app);
 		if (custom != null) {

@@ -1,6 +1,6 @@
 package asgel.app;
 
-import javax.swing.UIManager;
+import com.formdev.flatlaf.FlatDarkLaf;
 
 /**
  * @author Florent Guille
@@ -9,7 +9,7 @@ import javax.swing.UIManager;
 public class Main {
 
 	public static void main(String[] args) throws Exception {
-		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		FlatDarkLaf.setup();
 
 		// Use local value for config
 		LaunchConfig config = new LaunchConfig();

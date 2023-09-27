@@ -156,6 +156,7 @@ public class Model {
 			JsonObject obj = e.getAsJsonObject();
 			Link l = Link.create(objects.get(obj.get("startOBJ").getAsInt()).getPins()[obj.get("startPin").getAsInt()],
 					objects.get(obj.get("endOBJ").getAsInt()).getPins()[obj.get("endPin").getAsInt()]);
+			if(l == null)continue;
 			if (obj.has("path")) {
 				l.setPathFromJson(obj.get("path").getAsJsonArray());
 			}

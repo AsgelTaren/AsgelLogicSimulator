@@ -143,7 +143,8 @@ public class BundleRegistry {
 		}
 
 		public BufferedImage getBackground() {
-			return background;
+			return null;
+			// return background;
 		}
 
 		public BundleRegistry getRegistry() {

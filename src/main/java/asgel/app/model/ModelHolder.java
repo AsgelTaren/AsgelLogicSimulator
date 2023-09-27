@@ -468,7 +468,11 @@ public class ModelHolder extends JPanel
 	public void keyPressed(KeyEvent e) {
 		if (e.getKeyCode() == KeyEvent.VK_C) {
 			if (highOBJ != null && highOBJ instanceof Clickable c) {
-				c.onClick();
+				if (e.isControlDown()) {
+					c.reset();
+				} else {
+					c.onClick();
+				}
 				ArrayList<ModelOBJ> ref = new ArrayList<ModelOBJ>();
 				ref.add(highOBJ);
 				model.refresh(ref);
